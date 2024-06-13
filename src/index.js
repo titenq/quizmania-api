@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
 
 const secret = process.env.SECRET;
@@ -34,13 +35,19 @@ passport.use(new GitHubStrategy({
   (accessToken, refreshToken, profile, done) => {
     profile.token = accessToken;
 
-    /* const user = {
-      name: profile._json.name,
-      email: profile._json.email,
-      picture: profile._json.avatar_url
-    }; */
-
     return done(null, profile);
+  }));
+
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_SECRET_KEY,
+  callbackURL: "http://localhost:4000/auth/facebook/callback",
+  profileFields: ['id', 'displayName', 'email']
+},
+  (accessToken, refreshToken, profile, done) => {
+    profile.token = accessToken;
+
+    done(null, profile);
   }));
 
 passport.serializeUser((user, done) => {
@@ -70,6 +77,7 @@ app.get('/auth/github/user', (req, res) => {
     const obj = req.sessionStore.sessions;
     const key = Object.keys(obj)[0];
     const object = JSON.parse(obj[key]);
+    
     const userInfo = {
       name: object.passport.user._json.name,
       email: object.passport.user._json.email,
@@ -80,6 +88,20 @@ app.get('/auth/github/user', (req, res) => {
   } catch (error) {
     res.status(401).json({ message: 'Not authenticated' });
   }
+});
+
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect(`http://localhost:5173/auth/facebook/callback?token=${req.user.token}`);
+  });
+
+app.get('/auth/facebook/logout', (req, res) => {
+  req.logout(() => {
+    res.redirect('/');
+  });
 });
 
 app.listen(4000, () => {

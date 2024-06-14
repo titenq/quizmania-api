@@ -1,30 +1,36 @@
+const fs = require('node:fs');
+const path = require('node:path');
 require('dotenv').config();
+const axios = require('axios');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
+const multer = require('multer');
 
 const secret = process.env.SECRET;
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 
 const app = express();
+
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json());
 
 app.use(session({
   secret,
   resave: false,
   saveUninitialized: false,
 }));
-  
+
+app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('../uploads/facebook', express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
 
 passport.use(new GitHubStrategy({
   clientID: githubClientId,
@@ -42,7 +48,7 @@ passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_SECRET_KEY,
   callbackURL: "http://localhost:4000/auth/facebook/callback",
-  profileFields: ['id', 'displayName', 'email']
+  profileFields: ['id', 'displayName', 'photos', 'email']
 },
   (accessToken, refreshToken, profile, done) => {
     profile.token = accessToken;
@@ -97,6 +103,31 @@ app.get('/auth/facebook/callback',
   (req, res) => {
     res.redirect(`http://localhost:5173/auth/facebook/callback?token=${req.user.token}`);
   });
+
+app.get('/auth/facebook/user', async (req, res) => {
+  try {
+    const token = req.headers.facebook_token;
+
+    const response = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${token}`);
+
+    const user = response.data;
+
+    console.log(user);
+    /* const obj = req.sessionStore.sessions;
+    const key = Object.keys(obj)[0];
+    const object = JSON.parse(obj[key]);
+
+    const userInfo = {
+      name: object.passport.user._json.name,
+      email: object.passport.user._json.email,
+      picture: object.passport.user._json.avatar_url
+    };
+
+    res.json(userInfo); */
+  } catch (error) {
+    res.status(401).json({ message: 'Not authenticated' });
+  }
+});
 
 app.get('/auth/facebook/logout', (req, res) => {
   req.logout(() => {

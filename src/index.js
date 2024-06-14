@@ -8,7 +8,6 @@ const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
-const multer = require('multer');
 
 const secret = process.env.SECRET;
 const githubClientId = process.env.GITHUB_CLIENT_ID;
@@ -30,7 +29,7 @@ app.use(session({
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('../uploads/facebook', express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
+app.use('/uploads/facebook', express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
 
 passport.use(new GitHubStrategy({
   clientID: githubClientId,
@@ -110,20 +109,36 @@ app.get('/auth/facebook/user', async (req, res) => {
 
     const response = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${token}`);
 
-    const user = response.data;
+    const id = response.data.id;
+    const name = response.data.name;
+    const email = response.data.email;
+    const photo = response.data.picture.data.url;
 
-    console.log(user);
-    /* const obj = req.sessionStore.sessions;
-    const key = Object.keys(obj)[0];
-    const object = JSON.parse(obj[key]);
+    const photoResponse = await axios({
+      url: photo,
+      method: 'GET',
+      responseType: 'stream'
+    });
 
-    const userInfo = {
-      name: object.passport.user._json.name,
-      email: object.passport.user._json.email,
-      picture: object.passport.user._json.avatar_url
-    };
+    const photoPath = path.join(__dirname, '..', 'uploads', 'facebook', `${id}.jpg`);
+    const writer = fs.createWriteStream(photoPath);
 
-    res.json(userInfo); */
+    photoResponse.data.pipe(writer);
+
+    writer.on('finish', () => {
+      const photoUrl = `http://localhost:4000/uploads/facebook/${id}.jpg`;
+
+      res.json({
+        name,
+        email,
+        picture: photoUrl
+      });
+    });
+
+    writer.on('error', (err) => {
+      console.error('Error writing file:', err);
+      res.status(500).json({ message: 'Error saving photo' });
+    });
   } catch (error) {
     res.status(401).json({ message: 'Not authenticated' });
   }

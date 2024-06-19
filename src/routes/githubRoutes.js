@@ -1,4 +1,4 @@
-import express from 'express';
+/* import express from 'express';
 import passport from '../config/passport.js';
 
 const router = express.Router();
@@ -37,3 +37,4 @@ router.get('/user', (req, res) => {
 });
 
 export default router;
+ */

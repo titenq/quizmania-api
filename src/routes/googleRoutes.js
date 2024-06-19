@@ -1,35 +1,87 @@
+import 'dotenv/config';
 import express from 'express';
-
-import passport from '../config/passport.js';
-import getGoogleUser from '../helpers/getGoogleUser.js';
+import axios from 'axios';
 
 const router = express.Router();
 
-router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-router.get('/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    const token = req.user.token;
+const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+const googleTokenUrl = 'https://oauth2.googleapis.com/token';
+const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
+const googleRedirectUri = 'http://localhost:4000/google/callback';
 
-    if (token) {
-      res.redirect(`http://localhost:5173/auth/google/callback?token=${token}`);
-    } else {
-      res.redirect('http://localhost:5173/login?error=token_missing');
-    }
+const buildGoogleAuthUrl = () => {
+  const params = new URLSearchParams({
+    client_id: googleClientId,
+    redirect_uri: googleRedirectUri,
+    response_type: 'code',
+    scope: 'profile email',
+    access_type: 'offline',
+    prompt: 'consent'
+  });
+
+  return `${googleAuthUrl}?${params.toString()}`;
+};
+
+router.get('/', (req, res) => {
+  const url = buildGoogleAuthUrl();
+
+  res.redirect(url);
+});
+
+router.get('/callback', async (req, res) => {
+  const code = req.query.code;
+
+  if (!code) {
+    res.redirect('http://localhost:5173/login?error=missing_code');
+
+    return;
   }
-);
+
+  try {
+    const tokenResponse = await axios.post(googleTokenUrl, new URLSearchParams({
+      code,
+      client_id: googleClientId,
+      client_secret: googleClientSecret,
+      redirect_uri: googleRedirectUri,
+      grant_type: 'authorization_code'
+    }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const token = tokenResponse.data.access_token;
+
+    const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
+    const user = userInfoResponse.data;
+
+    req.session.user = user;
+    req.session.token = token;
+
+    res.redirect(`http://localhost:5173/auth/google/callback?token=${token}`);
+  } catch (error) {
+    console.error('Erro durante a autenticação com Google:', error);
+    
+    res.redirect('http://localhost:5173/login?error=auth_failed');
+  }
+});
 
 router.get('/user', (req, res) => {
   try {
     const obj = req.sessionStore.sessions;
     const key = Object.keys(obj)[0];
     const object = JSON.parse(obj[key]);
+    console.log(object);
 
     const userInfo = {
-      name: object.passport.user._json.name,
-      email: object.passport.user._json.email,
-      picture: object.passport.user._json.picture
+      name: object.user.name,
+      email: object.user.email,
+      picture: object.user.picture
     };
 
     res.json(userInfo);

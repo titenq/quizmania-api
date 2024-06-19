@@ -19,7 +19,8 @@
     "helmet": "^7.1.0",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
-    "passport-github2": "^0.1.12"
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -27,6 +28,7 @@
     "@types/express-session": "^1.18.0",
     "@types/passport": "^1.0.16",
     "@types/passport-facebook": "^3.0.3",
-    "@types/passport-github2": "^1.2.9"
+    "@types/passport-github2": "^1.2.9",
+    "@types/passport-google-oauth20": "^2.0.16"
   }
 }

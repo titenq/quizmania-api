@@ -6,8 +6,9 @@ import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
-import passport from './config/passport.js';
 
+import passport from './config/passport.js';
+import googleRoutes from './routes/googleRoutes.js';
 import facebookRoutes from './routes/facebookRoutes.js';
 import githubRoutes from './routes/githubRoutes.js';
 
@@ -40,11 +41,14 @@ app.use(session({
 
 app.use(helmet());
 app.use(express.json());
+
 app.use('/uploads/facebook',
   express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/google', googleRoutes);
 app.use('/facebook', facebookRoutes);
 app.use('/github', githubRoutes);
 

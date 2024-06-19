@@ -18,7 +18,8 @@ router.get('/callback',
   passport.authenticate('facebook', { failureRedirect: '/' }),
   (req, res) => {
     res.redirect(`http://localhost:5173/auth/facebook/callback?token=${req.user.token}`);
-  });
+  }
+);
 
 router.get('/user', async (req, res) => {
   try {

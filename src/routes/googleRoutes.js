@@ -1,17 +1,19 @@
 import express from 'express';
+
 import passport from '../config/passport.js';
+import getGoogleUser from '../helpers/getGoogleUser.js';
 
 const router = express.Router();
 
-router.get('/', passport.authenticate('github'));
+router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/callback',
-  passport.authenticate('github', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     const token = req.user.token;
 
     if (token) {
-      res.redirect(`http://localhost:5173/auth/github/callback?token=${token}`);
+      res.redirect(`http://localhost:5173/auth/google/callback?token=${token}`);
     } else {
       res.redirect('http://localhost:5173/login?error=token_missing');
     }
@@ -27,7 +29,7 @@ router.get('/user', (req, res) => {
     const userInfo = {
       name: object.passport.user._json.name,
       email: object.passport.user._json.email,
-      picture: object.passport.user._json.avatar_url
+      picture: object.passport.user._json.picture
     };
 
     res.json(userInfo);

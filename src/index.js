@@ -7,10 +7,9 @@ import session from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
 
-// import passport from './config/passport.js';
 import googleRoutes from './routes/googleRoutes.js';
 import facebookRoutes from './routes/facebookRoutes.js';
-// import githubRoutes from './routes/githubRoutes.js';
+import githubRoutes from './routes/githubRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,12 +45,9 @@ app.use(express.json());
 app.use('/uploads/facebook',
   express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
 
-// app.use(passport.initialize());
-// app.use(passport.session());
-
 app.use('/google', googleRoutes);
 app.use('/facebook', facebookRoutes);
-// app.use('/github', githubRoutes);
+app.use('/github', githubRoutes);
 
 app.listen(port , () => {
   console.log(`Server running on http://localhost:${port}`);

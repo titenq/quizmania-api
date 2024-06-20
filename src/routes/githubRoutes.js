@@ -1,40 +1,66 @@
-/* import express from 'express';
-import passport from '../config/passport.js';
+import 'dotenv/config';
+import express from 'express';
+import axios from 'axios';
+
+const githubClientId = process.env.GITHUB_CLIENT_ID;
+const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+const redirectUri = 'http://localhost:4000/github/callback';
 
 const router = express.Router();
 
-router.get('/', passport.authenticate('github'));
+router.get('/', (req, res) => {
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=user:email`;
 
-router.get('/callback',
-  passport.authenticate('github', { failureRedirect: '/' }),
-  (req, res) => {
-    const token = req.user.token;
+  res.redirect(githubAuthUrl);
+});
 
-    if (token) {
-      res.redirect(`http://localhost:5173/auth/github/callback?token=${token}`);
-    } else {
-      res.redirect('http://localhost:5173/login?error=token_missing');
-    }
-  }
-);
-
-router.get('/user', (req, res) => {
+router.get('/callback', async (req, res) => {
   try {
-    const obj = req.sessionStore.sessions;
-    const key = Object.keys(obj)[0];
-    const object = JSON.parse(obj[key]);
+    const code = req.query.code;
 
-    const userInfo = {
-      name: object.passport.user._json.name,
-      email: object.passport.user._json.email,
-      picture: object.passport.user._json.avatar_url
+    const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+      client_id: githubClientId,
+      client_secret: githubClientSecret,
+      code,
+      redirect_uri: redirectUri
+    }, {
+      headers: {
+        Accept: 'application/json'
+      }
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+
+    res.redirect(`http://localhost:5173/auth/github/callback?token=${accessToken}`);
+  } catch (error) {
+    console.error('Error during GitHub OAuth process:', error);
+
+    res.status(500).json({ message: 'Authentication failed' });
+  }
+});
+
+router.get('/user', async(req, res) => {
+  try {
+    const token = req.headers.github_token;
+
+    const userResponse = await axios.get('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const userInfo = userResponse.data;
+
+    const user = {
+      name: userInfo.name,
+      email: userInfo.email,
+      picture: userInfo.avatar_url
     };
 
-    res.json(userInfo);
+    res.json(user);
   } catch (error) {
     res.status(401).json({ error: 'Not authenticated' });
   }
 });
 
 export default router;
- */

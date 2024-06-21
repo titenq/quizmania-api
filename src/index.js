@@ -7,9 +7,11 @@ import session from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
 
+import baseUrl from './helpers/baseUrl.js';
 import googleRoutes from './routes/googleRoutes.js';
 import facebookRoutes from './routes/facebookRoutes.js';
 import githubRoutes from './routes/githubRoutes.js';
+import pingRoutes from './routes/pingRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,7 +50,8 @@ app.use('/uploads/facebook',
 app.use('/google', googleRoutes);
 app.use('/facebook', facebookRoutes);
 app.use('/github', githubRoutes);
+app.use('/ping', pingRoutes);
 
 app.listen(port , () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on ${baseUrl}`);
 });

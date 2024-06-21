@@ -2,9 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 
+import baseUrl from '../helpers/baseUrl.js';
+import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
-const redirectUri = 'http://localhost:4000/github/callback';
+const redirectUri = `${baseUrl}/github/callback`;
 
 const router = express.Router();
 
@@ -31,7 +34,7 @@ router.get('/callback', async (req, res) => {
 
     const accessToken = tokenResponse.data.access_token;
 
-    res.redirect(`http://localhost:5173/auth/github/callback?token=${accessToken}`);
+    res.redirect(`${frontendBaseUrl}/auth/github/callback?token=${accessToken}`);
   } catch (error) {
     console.error('Error during GitHub OAuth process:', error);
 

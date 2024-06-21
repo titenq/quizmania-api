@@ -2,6 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 
+import baseUrl from '../helpers/baseUrl.js';
+import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+
 const router = express.Router();
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
@@ -10,7 +13,7 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
-const googleRedirectUri = 'http://localhost:4000/google/callback';
+const googleRedirectUri = `${baseUrl}/google/callback`;
 
 const buildGoogleAuthUrl = () => {
   const params = new URLSearchParams({
@@ -35,7 +38,7 @@ router.get('/callback', async (req, res) => {
   const code = req.query.code;
 
   if (!code) {
-    res.redirect('http://localhost:5173/login?error=missing_code');
+    res.redirect(`${frontendBaseUrl}/login?error=missing_code`);
 
     return;
   }
@@ -63,11 +66,11 @@ router.get('/callback', async (req, res) => {
     req.session.user = user;
     req.session.token = token;
 
-    res.redirect(`http://localhost:5173/auth/google/callback?token=${token}`);
+    res.redirect(`${frontendBaseUrl}/auth/google/callback?token=${token}`);
   } catch (error) {
     console.error('Erro durante a autenticação com Google:', error);
     
-    res.redirect('http://localhost:5173/login?error=auth_failed');
+    res.redirect(`${frontendBaseUrl}/login?error=auth_failed`);
   }
 });
 
@@ -76,7 +79,6 @@ router.get('/user', (req, res) => {
     const obj = req.sessionStore.sessions;
     const key = Object.keys(obj)[0];
     const object = JSON.parse(obj[key]);
-    console.log(object);
 
     const userInfo = {
       name: object.user.name,

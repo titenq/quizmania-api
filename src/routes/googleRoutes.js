@@ -10,35 +10,19 @@ const router = express.Router();
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
 const googleRedirectUri = `${baseUrl}/google/callback`;
 
-const buildGoogleAuthUrl = () => {
-  const params = new URLSearchParams({
-    client_id: googleClientId,
-    redirect_uri: googleRedirectUri,
-    response_type: 'code',
-    scope: 'profile email',
-    access_type: 'offline',
-    prompt: 'consent'
-  });
-
-  return `${googleAuthUrl}?${params.toString()}`;
-};
-
 router.get('/', (req, res) => {
-  const url = buildGoogleAuthUrl();
-
-  res.redirect(url);
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
 });
 
 router.get('/callback', async (req, res) => {
   const code = req.query.code;
 
   if (!code) {
-    res.redirect(`${frontendBaseUrl}/login?error=missing_code`);
+    res.redirect(`${frontendBaseUrl}/login?error=google`);
 
     return;
   }
@@ -74,7 +58,7 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.get('/user', (req, res) => {
+router.post('/user', (req, res) => {
   try {
     const obj = req.sessionStore.sessions;
     const key = Object.keys(obj)[0];

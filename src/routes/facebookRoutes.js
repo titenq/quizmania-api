@@ -11,7 +11,6 @@ import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const nameSession = process.env.NAME_SESSION;
 const facebookAppId = process.env.FACEBOOK_APP_ID;
 const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY;
 const facebookAuthUrl = 'https://www.facebook.com/v11.0/dialog/oauth';
@@ -77,7 +76,7 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.get('/user', async (req, res) => {
+router.post('/user', async (req, res) => {
   try {
     const token = req.headers.facebook_token;
 
@@ -115,17 +114,6 @@ router.get('/user', async (req, res) => {
     });
   } catch (error) {
     res.status(401).json({ error: 'Not authenticated' });
-  }
-});
-
-router.post('/logout', async (req, res) => {
-  try {
-    req.session.destroy();
-    res.clearCookie(nameSession);
-
-    res.status(200).json({ message: 'Sucesso ao fazer logout' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao fazer logout' });
   }
 });
 

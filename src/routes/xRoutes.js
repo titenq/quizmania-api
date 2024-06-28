@@ -16,10 +16,10 @@ const xAccessToken = process.env.X_ACCESS_TOKEN;
 const xAccessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET;
 const xClientId = process.env.X_CLIENT_ID;
 
-const callbackUrl = `${baseUrl}/x/callback`;
+const xRedirectUri = `${baseUrl}/x/callback`;
 
 router.get('/', async (req, res) => {
-  res.redirect(`https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${xClientId}&redirect_uri=${callbackUrl}&scope=tweet.read%20users.read%20follows.read%20offline.access&state=state&code_challenge=challenge&code_challenge_method=plain`);
+  res.redirect(`https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${xClientId}&redirect_uri=${xRedirectUri}&scope=tweet.read%20users.read%20follows.read%20offline.access&state=state&code_challenge=challenge&code_challenge_method=plain`);
 });
 
 router.get('/callback', async (req, res) => {
@@ -38,7 +38,7 @@ router.get('/callback', async (req, res) => {
       code,
       grant_type: 'client_credentials',
       client_id: xClientId,
-      redirect_uri: callbackUrl
+      redirect_uri: xRedirectUri
     };
 
     const response = await axios.post('https://api.twitter.com/oauth2/token',
@@ -51,8 +51,6 @@ router.get('/callback', async (req, res) => {
       }
     );
 
-    console.log(response.data);
-
     const { access_token } = response.data;
 
     res.redirect(`${frontendBaseUrl}/auth/x/callback?token=${access_token}`);
@@ -63,7 +61,9 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.get('/user', async (req, res) => {
+router.post('/user', async (req, res) => {
+  const token = req.headers.x_token;
+  
   const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
   const method = 'GET';
 
@@ -99,7 +99,7 @@ router.get('/user', async (req, res) => {
 
     const userInfo = response.data;
 
-    res.json({
+    res.status(200).json({
       name: userInfo.name,
       email: userInfo.id_str,
       picture: userInfo.profile_image_url_https,
@@ -109,6 +109,32 @@ router.get('/user', async (req, res) => {
 
     res.status(401).json({ error: 'Not authenticated' });
   }
+
+  /* try {
+    const token = req.headers['x_token'];
+    console.log(token);
+    if (token) {
+      const userInfoResponse = await axios.get('https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const userInfo = userInfoResponse.data;
+
+      res.json({
+        name: userInfo.name,
+        username: userInfo.screen_name,
+        id: userInfo.id_str,
+        profile_image_url: userInfo.profile_image_url_https,
+        email: userInfo.email,
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    res.status(401).json({ error: 'Not authenticated' });
+  } */
 });
 
 export default router;

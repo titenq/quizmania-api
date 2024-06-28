@@ -7,14 +7,12 @@ import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
 
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
-const redirectUri = `${baseUrl}/github/callback`;
+const githubRedirectUri = `${baseUrl}/github/callback`;
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=user:email`;
-
-  res.redirect(githubAuthUrl);
+  res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${githubRedirectUri}&scope=user:email`);
 });
 
 router.get('/callback', async (req, res) => {
@@ -25,7 +23,7 @@ router.get('/callback', async (req, res) => {
       client_id: githubClientId,
       client_secret: githubClientSecret,
       code,
-      redirect_uri: redirectUri
+      redirect_uri: githubRedirectUri
     }, {
       headers: {
         Accept: 'application/json'
@@ -42,7 +40,7 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.get('/user', async(req, res) => {
+router.post('/user', async(req, res) => {
   try {
     const token = req.headers.github_token;
 

@@ -14,6 +14,7 @@ import googleRoutes from './routes/googleRoutes.js';
 import facebookRoutes from './routes/facebookRoutes.js';
 import xRoutes from './routes/xRoutes.js';
 import githubRoutes from './routes/githubRoutes.js';
+import logoutRoutes from './routes/logoutRoutes.js';
 import pingRoutes from './routes/pingRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,16 +27,18 @@ const nodeEnv = process.env.NODE_ENV;
 
 const app = express();
 
-app.use(cors({
-  origin: siteOrigin,
-  credentials: true
+app.use(express.json());
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  frameguard: false
 }));
 
 app.use(session({
   name: nameSession,
   secret,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     secure: nodeEnv === 'PROD',
     httpOnly: true,
@@ -43,8 +46,19 @@ app.use(session({
   }
 }));
 
-app.use(helmet());
-app.use(express.json());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  credentials: true,
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Access-Control-Allow-Origin',
+    'facebook_token',
+    'github_token',
+    'google_token',
+    'x_token'
+  ]
+}));
 
 app.use('/uploads/facebook',
   express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
@@ -53,6 +67,7 @@ app.use('/google', googleRoutes);
 app.use('/facebook', facebookRoutes);
 app.use('/x', xRoutes);
 app.use('/github', githubRoutes);
+app.use('/logout', logoutRoutes);
 app.use('/ping', pingRoutes);
 
 const pingEndpoint = () => {
@@ -64,7 +79,7 @@ const pingEndpoint = () => {
     } catch (err) {
       console.error('Erro ao fazer ping:', err);
     }
-  }, 40000);
+  }, 840000); // 14 minutos
 };
 
 app.listen(port , () => {

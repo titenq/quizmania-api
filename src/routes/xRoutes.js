@@ -29,7 +29,11 @@ router.get('/callback', async (req, res) => {
       .join('&');
   };
 
-  const { code } = req.query;
+  const code = req.query.code;
+
+  if (!code) {
+    return res.redirect(`${frontendBaseUrl}/login?error=x`);
+  }
 
   try {
     const base64Credentials = Buffer.from(`${xApiKey}:${xApiKeySecret}`, 'utf-8').toString('base64');
@@ -55,9 +59,7 @@ router.get('/callback', async (req, res) => {
 
     res.redirect(`${frontendBaseUrl}/auth/x/callback?token=${access_token}`);
   } catch (error) {
-    console.error('Erro ao obter o token de acesso:', error);
-
-    res.status(500).json({ message: 'Falha ao obter o token de acesso' });
+    res.redirect(`${frontendBaseUrl}/login?error=x`);
   }
 });
 
@@ -99,42 +101,16 @@ router.post('/user', async (req, res) => {
 
     const userInfo = response.data;
 
-    res.status(200).json({
+    const user = {
       name: userInfo.name,
       email: userInfo.id_str,
       picture: userInfo.profile_image_url_https,
-    });
-  } catch (error) {
-    console.error('Error fetching user info:', error.response ? error.response.data : error);
+    };
 
-    res.status(401).json({ error: 'Not authenticated' });
+    res.status(200).json(user);
+  } catch (error) {
+    res.redirect(`${frontendBaseUrl}/login?error=x`);
   }
-
-  /* try {
-    const token = req.headers['x_token'];
-    console.log(token);
-    if (token) {
-      const userInfoResponse = await axios.get('https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const userInfo = userInfoResponse.data;
-
-      res.json({
-        name: userInfo.name,
-        username: userInfo.screen_name,
-        id: userInfo.id_str,
-        profile_image_url: userInfo.profile_image_url_https,
-        email: userInfo.email,
-      });
-    }
-  } catch (error) {
-    console.error('Error fetching user info:', error);
-    res.status(401).json({ error: 'Not authenticated' });
-  } */
 });
 
 export default router;

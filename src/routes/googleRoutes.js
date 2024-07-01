@@ -22,9 +22,7 @@ router.get('/callback', async (req, res) => {
   const code = req.query.code;
 
   if (!code) {
-    res.redirect(`${frontendBaseUrl}/login?error=google`);
-
-    return;
+    return res.redirect(`${frontendBaseUrl}/login?error=google`);
   }
 
   try {
@@ -44,35 +42,32 @@ router.get('/callback', async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
-    const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
-    const user = userInfoResponse.data;
-
-    req.session.user = user;
-    req.session.token = token;
-
     res.redirect(`${frontendBaseUrl}/auth/google/callback?token=${token}`);
   } catch (error) {
-    console.error('Erro durante a autenticação com Google:', error);
-    
-    res.redirect(`${frontendBaseUrl}/login?error=auth_failed`);
+    res.redirect(`${frontendBaseUrl}/login?error=google`);
   }
 });
 
-router.post('/user', (req, res) => {
+router.post('/user', async (req, res) => {
   try {
-    const obj = req.sessionStore.sessions;
-    const key = Object.keys(obj)[0];
-    const object = JSON.parse(obj[key]);
+    const token = req.headers.google_token;
+
+    if (!token) {
+      return res.redirect(`${frontendBaseUrl}/login?error=token`);
+    }
+
+    const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
+    const user = await userInfoResponse.data;
 
     const userInfo = {
-      name: object.user.name,
-      email: object.user.email,
-      picture: object.user.picture
+      name: user.name,
+      email: user.email,
+      picture: user.picture
     };
 
-    res.json(userInfo);
+    res.status(200).json(userInfo);
   } catch (error) {
-    res.status(401).json({ error: 'Not authenticated' });
+    res.redirect(`${frontendBaseUrl}/login?error=google`);
   }
 });
 

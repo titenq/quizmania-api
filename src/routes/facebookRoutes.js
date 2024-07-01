@@ -41,8 +41,7 @@ router.get('/callback', async (req, res) => {
   const code = req.query.code;
 
   if (!code) {
-    res.redirect(`${frontendBaseUrl}/login?error=missing_code`);
-    return;
+    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
   }
 
   try {
@@ -57,28 +56,19 @@ router.get('/callback', async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
-    const userInfoResponse = await axios.get(facebookUserInfoUrl, {
-      params: {
-        access_token: token,
-        fields: 'id,name,email,picture'
-      }
-    });
-    
-    const user = userInfoResponse.data;
-
-    req.session.user = user;
-    req.session.token = token;
-
     res.redirect(`${frontendBaseUrl}/auth/facebook/callback?token=${token}`);
   } catch (error) {
-    console.error('Erro durante a autenticação com Facebook:', error.response ? error.response.data : error);
-    res.redirect(`${frontendBaseUrl}/login?error=auth_failed`);
+    res.redirect(`${frontendBaseUrl}/login?error=facebook`);
   }
 });
 
 router.post('/user', async (req, res) => {
   try {
     const token = req.headers.facebook_token;
+
+    if (!token) {
+      return res.redirect(`${frontendBaseUrl}/login?error=token`);
+    }
 
     const response = await axios.get(`${facebookUserInfoUrl}?fields=id,name,email,picture.type(large)&access_token=${token}`);
 
@@ -108,12 +98,11 @@ router.post('/user', async (req, res) => {
       });
     });
 
-    writer.on('error', (err) => {
-      console.error('Error writing file:', err);
-      res.status(500).json({ message: 'Error saving photo' });
+    writer.on('error', error => {
+      return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
     });
   } catch (error) {
-    res.status(401).json({ error: 'Not authenticated' });
+    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
   }
 });
 

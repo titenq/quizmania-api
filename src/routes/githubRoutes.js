@@ -19,6 +19,10 @@ router.get('/callback', async (req, res) => {
   try {
     const code = req.query.code;
 
+    if (!code) {
+      return res.redirect(`${frontendBaseUrl}/login?error=github`);
+    }
+
     const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
       client_id: githubClientId,
       client_secret: githubClientSecret,
@@ -34,15 +38,17 @@ router.get('/callback', async (req, res) => {
 
     res.redirect(`${frontendBaseUrl}/auth/github/callback?token=${accessToken}`);
   } catch (error) {
-    console.error('Error during GitHub OAuth process:', error);
-
-    res.status(500).json({ message: 'Authentication failed' });
+    res.redirect(`${frontendBaseUrl}/login?error=github`);
   }
 });
 
 router.post('/user', async(req, res) => {
   try {
     const token = req.headers.github_token;
+
+    if (!token) {
+      return res.redirect(`${frontendBaseUrl}/login?error=token`);
+    }
 
     const userResponse = await axios.get('https://api.github.com/user', {
       headers: {
@@ -58,9 +64,9 @@ router.post('/user', async(req, res) => {
       picture: userInfo.avatar_url
     };
 
-    res.json(user);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(401).json({ error: 'Not authenticated' });
+    res.redirect(`${frontendBaseUrl}/login?error=github`);
   }
 });
 

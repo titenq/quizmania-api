@@ -7,7 +7,6 @@ import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
 
 const router = express.Router();
 
-
 const xApiKey = process.env.X_API_KEY;
 const xApiKeySecret = process.env.X_API_KEY_SECRET;
 const xClientId = process.env.X_CLIENT_ID;
@@ -47,14 +46,16 @@ router.get('/callback', async (req, res) => {
 
     res.redirect(`${frontendBaseUrl}/auth/x/callback?token=${access_token}`);
   } catch (error) {
-    console.error('Error during OAuth callback:', error.response ? error.response.data : error.message);
-    
     res.redirect(`${frontendBaseUrl}/login?error=x`);
   }
 });
 
 router.post('/user', async (req, res) => {
   const token = req.headers.x_token;
+
+  if (!token) {
+    return res.redirect(`${frontendBaseUrl}/login?error=token`);
+  }
 
   try {
     const response = await axios.get('https://api.twitter.com/2/users/me', {
@@ -74,10 +75,9 @@ router.post('/user', async (req, res) => {
       picture: userInfo.data.profile_image_url
     };
 
-    res.json(user);
+    res.status(200).json(user);
   } catch (error) {
-    console.error('Error fetching user info:', error.response ? error.response.data : error.message);
-    res.status(500).json('Error fetching user info');
+    res.redirect(`${frontendBaseUrl}/login?error=x`);
   }
 });
 

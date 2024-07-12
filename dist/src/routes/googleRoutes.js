@@ -91,13 +91,13 @@ router.post('/user', function() {
                 return res.redirect(`${_frontendBaseUrl.default}/login?error=token`);
             }
             const userInfoResponse = yield _axios.default.get(`${googleUserInfoUrl}?access_token=${token}`);
-            const user = yield userInfoResponse.data;
-            const userInfo = {
-                name: user.name,
-                email: user.email,
-                picture: user.picture
+            const userInfo = yield userInfoResponse.data;
+            const user = {
+                name: userInfo.name,
+                email: userInfo.email,
+                picture: userInfo.picture
             };
-            res.status(200).json(userInfo);
+            res.status(200).json(user);
         } catch (error) {
             res.redirect(`${_frontendBaseUrl.default}/login?error=google`);
         }

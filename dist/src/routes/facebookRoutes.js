@@ -86,9 +86,9 @@ router.get('/callback', function() {
                 }
             });
             const token = tokenResponse.data.access_token;
-            res.redirect(`${_frontendBaseUrl.default}/auth/facebook/callback?token=${token}`);
+            return res.redirect(`${_frontendBaseUrl.default}/auth/facebook/callback?token=${token}`);
         } catch (error) {
-            res.redirect(`${_frontendBaseUrl.default}/login?error=facebook`);
+            return res.redirect(`${_frontendBaseUrl.default}/login?error=facebook`);
         }
     });
     return function(req, res) {
@@ -113,17 +113,16 @@ router.post('/user', function() {
                 responseType: 'stream'
             });
             const photoPath = _nodepath.default.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
-            console.log(dirname);
-            console.log(photoPath);
             const writer = _nodefs.default.createWriteStream(photoPath);
             photoResponse.data.pipe(writer);
             writer.on('finish', ()=>{
                 const photoUrl = `${_baseUrl.default}/uploads/facebook/${id}.jpg`;
-                res.json({
+                const user = {
                     name,
                     email,
                     picture: photoUrl
-                });
+                };
+                res.status(200).json(user);
             });
             writer.on('error', (error)=>{
                 return res.redirect(`${_frontendBaseUrl.default}/login?error=facebook`);

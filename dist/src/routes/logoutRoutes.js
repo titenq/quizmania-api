@@ -7,6 +7,7 @@ Object.defineProperty(exports, "default", {
         return _default;
     }
 });
+const _nodeutil = require("node:util");
 const _express = /*#__PURE__*/ _interop_require_default(require("express"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
@@ -44,20 +45,22 @@ function _interop_require_default(obj) {
 }
 const nameSession = process.env.NAME_SESSION;
 const router = _express.default.Router();
+const destroySession = (req)=>(0, _nodeutil.promisify)(req.session.destroy.bind(req.session));
 router.get('/', function() {
     var _ref = _async_to_generator(function*(req, res) {
-        req.session.destroy((err)=>{
-            if (err) {
-                console.error('Erro ao destruir a sessão:', err);
-                return res.status(500).json({
-                    message: 'Erro ao fazer logout'
-                });
-            }
+        try {
+            destroySession(req);
             res.clearCookie(nameSession);
-            return res.status(200).json({
+            const messageSuccess = {
                 message: 'Sucesso ao fazer logout'
-            });
-        });
+            };
+            return res.status(200).json(messageSuccess);
+        } catch (error) {
+            const messageError = {
+                message: 'Erro ao fazer logout'
+            };
+            return res.status(500).json(messageError);
+        }
     });
     return function(req, res) {
         return _ref.apply(this, arguments);

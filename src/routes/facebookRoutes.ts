@@ -2,17 +2,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import axios from 'axios';
 
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import { IUser } from '../interfaces/IUser';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const facebookAppId = process.env.FACEBOOK_APP_ID as string;
-const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY as string;
+const facebookAppId = process.env.FACEBOOK_APP_ID;
+const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY;
 const facebookAuthUrl = 'https://www.facebook.com/v11.0/dialog/oauth';
 const facebookTokenUrl = 'https://graph.facebook.com/v11.0/oauth/access_token';
 const facebookUserInfoUrl = 'https://graph.facebook.com/me';
@@ -26,18 +27,18 @@ const buildFacebookAuthUrl = () => {
     redirect_uri: facebookRedirectUri,
     response_type: 'code',
     scope: 'email,public_profile'
-  });
+  } as Record<string, string>);
 
   return `${facebookAuthUrl}?${params.toString()}`;
 };
 
-router.get('/', (req, res) => {
+router.get('/', (req: Request, res: Response): void => {
   const url = buildFacebookAuthUrl();
 
   res.redirect(url);
 });
 
-router.get('/callback', async (req, res) => {
+router.get('/callback', async (req: Request, res: Response): Promise<void> => {
   const code = req.query.code;
 
   if (!code) {
@@ -56,13 +57,13 @@ router.get('/callback', async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
-    res.redirect(`${frontendBaseUrl}/auth/facebook/callback?token=${token}`);
+    return res.redirect(`${frontendBaseUrl}/auth/facebook/callback?token=${token}`);
   } catch (error) {
-    res.redirect(`${frontendBaseUrl}/login?error=facebook`);
+    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
   }
 });
 
-router.post('/user', async (req, res) => {
+router.post('/user', async (req: Request, res: Response): Promise<IUser | void> => {
   try {
     const token = req.headers.facebook_token;
 
@@ -84,8 +85,6 @@ router.post('/user', async (req, res) => {
     });
 
     const photoPath = path.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
-    console.log(dirname)
-    console.log(photoPath)
     const writer = fs.createWriteStream(photoPath);
 
     photoResponse.data.pipe(writer);
@@ -93,11 +92,13 @@ router.post('/user', async (req, res) => {
     writer.on('finish', () => {
       const photoUrl = `${baseUrl}/uploads/facebook/${id}.jpg`;
 
-      res.json({
+      const user: IUser = {
         name,
         email,
         picture: photoUrl
-      });
+      };
+
+      res.status(200).json(user);
     });
 
     writer.on('error', error => {

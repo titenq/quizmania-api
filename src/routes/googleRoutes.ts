@@ -1,25 +1,26 @@
 import 'dotenv/config';
-import express from 'express';
-import axios from 'axios';
+import express, { Request, Response, Router } from 'express';
+import axios, { AxiosResponse } from 'axios';
 
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import { IUser } from '../interfaces/IUser';
 
 const router = express.Router();
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID as string;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
 const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
 const googleRedirectUri = `${baseUrl}/google/callback`;
 
-router.get('/', (req, res) => {
+router.get('/', (req: Request, res: Response): void => {
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
 });
 
-router.get('/callback', async (req, res) => {
-  const code = req.query.code as string;
+router.get('/callback', async (req: Request, res: Response): Promise<void> => {
+  const code = req.query.code;
 
   if (!code) {
     return res.redirect(`${frontendBaseUrl}/login?error=google`);
@@ -32,7 +33,7 @@ router.get('/callback', async (req, res) => {
       client_secret: googleClientSecret,
       redirect_uri: googleRedirectUri,
       grant_type: 'authorization_code'
-    }),
+    } as Record<string, string>),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -48,7 +49,7 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.post('/user', async (req, res) => {
+router.post('/user', async (req, res): Promise<IUser | void> => {
   try {
     const token = req.headers.google_token;
 
@@ -57,15 +58,15 @@ router.post('/user', async (req, res) => {
     }
 
     const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
-    const user = await userInfoResponse.data;
+    const userInfo = await userInfoResponse.data;
 
-    const userInfo = {
-      name: user.name,
-      email: user.email,
-      picture: user.picture
+    const user: IUser = {
+      name: userInfo.name,
+      email: userInfo.email,
+      picture: userInfo.picture
     };
 
-    res.status(200).json(userInfo);
+    res.status(200).json(user);
   } catch (error) {
     res.redirect(`${frontendBaseUrl}/login?error=google`);
   }

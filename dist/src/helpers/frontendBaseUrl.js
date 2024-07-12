@@ -8,9 +8,9 @@ Object.defineProperty(exports, "default", {
     }
 });
 require("dotenv/config");
-const nodeEnv = process.env.NODE_ENV;
+const { NODE_ENV } = process.env;
 let frontendBaseUrl;
-if (nodeEnv === 'DEV') {
+if (NODE_ENV === 'DEV') {
     frontendBaseUrl = 'http://localhost:5173';
 } else {
     frontendBaseUrl = 'https://frontend.com';

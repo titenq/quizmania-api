@@ -1,20 +1,28 @@
-import express from 'express';
+import { promisify } from 'node:util';
 
-const nameSession = process.env.NAME_SESSION as string;
+import express, { Request, Response } from 'express';
+import { ILogoutResponse } from '../interfaces/ILogoutResponse';
+
+const nameSession = process.env.NAME_SESSION;
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Erro ao destruir a sessão:', err);
-      return res.status(500).json({ message: 'Erro ao fazer logout' });
-    }
+const destroySession = (req: Request) => promisify(req.session.destroy.bind(req.session));
 
-    res.clearCookie(nameSession);
+router.get('/', async (req: Request, res: Response): Promise<Response<ILogoutResponse>> => {
+  try {
+    destroySession(req);
 
-    return res.status(200).json({ message: 'Sucesso ao fazer logout' });
-  });
+    res.clearCookie(nameSession!);
+
+    const messageSuccess: ILogoutResponse = { message: 'Sucesso ao fazer logout' };
+
+    return res.status(200).json(messageSuccess);
+  } catch (error) {
+    const messageError: ILogoutResponse = { message: 'Erro ao fazer logout' };
+
+    return res.status(500).json(messageError);
+  }
 });
 
 export default router;

@@ -2,8 +2,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import 'dotenv/config';
-import express from 'express';
-import axios from 'axios';
+import express, { Application } from 'express';
+import axios, { AxiosResponse } from 'axios';
 import session from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -20,12 +20,9 @@ import pingRoutes from './routes/pingRoutes';
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const port = process.env.PORT as string;
-const secret = process.env.SECRET as string;
-const nameSession = process.env.NAME_SESSION as string;
-const nodeEnv = process.env.NODE_ENV as string;
+const { PORT, SECRET, NAME_SESSION, NODE_ENV } = process.env;
 
-const app = express();
+const app: Application = express();
 
 app.use(express.json());
 
@@ -35,19 +32,19 @@ app.use(helmet({
 }));
 
 app.use(session({
-  name: nameSession,
-  secret,
+  name: NAME_SESSION,
+  secret: SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: nodeEnv === 'PROD',
+    secure: NODE_ENV === 'PROD',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 1 dia
   }
 }));
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: siteOrigin,
   credentials: true,
   allowedHeaders: [
     'Content-Type',
@@ -73,7 +70,7 @@ app.use('/ping', pingRoutes);
 const pingEndpoint = () => {
   setInterval(async () => {
     try {
-      const response = await axios.get(`${baseUrl}/ping`);
+      const response: AxiosResponse<string, string> = await axios.get(`${baseUrl}/ping`);
       
       console.log('Ping response:', response.data);
     } catch (err) {
@@ -82,7 +79,7 @@ const pingEndpoint = () => {
   }, 840000); // 14 minutos
 };
 
-app.listen(port , () => {
+app.listen(PORT , () => {
   console.log(`Server running on ${baseUrl}`);
 
   pingEndpoint();

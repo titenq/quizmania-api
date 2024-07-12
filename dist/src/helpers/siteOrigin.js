@@ -8,12 +8,11 @@ Object.defineProperty(exports, "default", {
     }
 });
 require("dotenv/config");
-const nodeEnv = process.env.NODE_ENV;
-const origin = process.env.ORIGIN;
+const { NODE_ENV, ORIGIN } = process.env;
 let siteOrigin;
-if (nodeEnv === 'DEV') {
+if (NODE_ENV === 'DEV') {
     siteOrigin = 'http://localhost:5173';
 } else {
-    siteOrigin = origin;
+    siteOrigin = ORIGIN || '';
 }
 const _default = siteOrigin;

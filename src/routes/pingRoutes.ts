@@ -1,11 +1,13 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+
+import { IPingResponse } from '../interfaces/IPingResponse';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const response = { ping: 'pong' };
+router.get('/', (req: Request, res: Response): Response<IPingResponse> => {
+  const response: IPingResponse = { ping: 'pong' };
 
-  res.json(response);
+  return res.status(200).json(response);
 });
 
 export default router;

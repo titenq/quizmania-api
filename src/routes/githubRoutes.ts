@@ -1,21 +1,22 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import axios from 'axios';
 
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import { IUser } from '../interfaces/IUser';
 
-const githubClientId = process.env.GITHUB_CLIENT_ID as string;
-const githubClientSecret = process.env.GITHUB_CLIENT_SECRET as string;
+const githubClientId = process.env.GITHUB_CLIENT_ID;
+const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 const githubRedirectUri = `${baseUrl}/github/callback`;
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', (req: Request, res: Response): void => {
   res.redirect(`https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${githubRedirectUri}&scope=user:email`);
 });
 
-router.get('/callback', async (req, res) => {
+router.get('/callback', async (req: Request, res: Response): Promise<void> => {
   try {
     const code = req.query.code;
 
@@ -42,7 +43,7 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-router.post('/user', async(req, res) => {
+router.post('/user', async(req: Request, res: Response): Promise<IUser | void> => {
   try {
     const token = req.headers.github_token;
 
@@ -58,7 +59,7 @@ router.post('/user', async(req, res) => {
 
     const userInfo = userResponse.data;
 
-    const user = {
+    const user: IUser = {
       name: userInfo.name,
       email: userInfo.email,
       picture: userInfo.avatar_url

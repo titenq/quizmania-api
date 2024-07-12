@@ -18,6 +18,6 @@ router.get('/', (req, res)=>{
     const response = {
         ping: 'pong'
     };
-    res.json(response);
+    return res.status(200).json(response);
 });
 const _default = router;

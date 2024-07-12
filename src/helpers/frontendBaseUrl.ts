@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
-const nodeEnv = process.env.NODE_ENV as string;
+const { NODE_ENV } = process.env;
 let frontendBaseUrl: string;
 
-if (nodeEnv === 'DEV') {
+if (NODE_ENV === 'DEV') {
   frontendBaseUrl = 'http://localhost:5173';
 } else {
   frontendBaseUrl = 'https://frontend.com';

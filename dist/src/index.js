@@ -10,6 +10,7 @@ const _expresssession = /*#__PURE__*/ _interop_require_default(require("express-
 const _cors = /*#__PURE__*/ _interop_require_default(require("cors"));
 const _helmet = /*#__PURE__*/ _interop_require_default(require("helmet"));
 const _baseUrl = /*#__PURE__*/ _interop_require_default(require("./helpers/baseUrl"));
+const _siteOrigin = /*#__PURE__*/ _interop_require_default(require("./helpers/siteOrigin"));
 const _googleRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/googleRoutes"));
 const _facebookRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/facebookRoutes"));
 const _xRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/xRoutes"));
@@ -52,10 +53,7 @@ function _interop_require_default(obj) {
 }
 const filename = (0, _nodeurl.fileURLToPath)(require("url").pathToFileURL(__filename).toString());
 const dirname = _nodepath.default.dirname(filename);
-const port = process.env.PORT;
-const secret = process.env.SECRET;
-const nameSession = process.env.NAME_SESSION;
-const nodeEnv = process.env.NODE_ENV;
+const { PORT, SECRET, NAME_SESSION, NODE_ENV } = process.env;
 const app = (0, _express.default)();
 app.use(_express.default.json());
 app.use((0, _helmet.default)({
@@ -63,21 +61,18 @@ app.use((0, _helmet.default)({
     frameguard: false
 }));
 app.use((0, _expresssession.default)({
-    name: nameSession,
-    secret,
+    name: NAME_SESSION,
+    secret: SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: nodeEnv === 'PROD',
+        secure: NODE_ENV === 'PROD',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 // 1 dia
     }
 }));
 app.use((0, _cors.default)({
-    origin: [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173'
-    ],
+    origin: _siteOrigin.default,
     credentials: true,
     allowedHeaders: [
         'Content-Type',
@@ -106,7 +101,7 @@ const pingEndpoint = ()=>{
         }
     }), 840000); // 14 minutos
 };
-app.listen(port, ()=>{
+app.listen(PORT, ()=>{
     console.log(`Server running on ${_baseUrl.default}`);
     pingEndpoint();
 });

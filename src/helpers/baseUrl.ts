@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
-const nodeEnv = process.env.NODE_ENV;
-let baseUrl;
+const nodeEnv = process.env.NODE_ENV as string;
+let baseUrl: string;
 
 if (nodeEnv === 'DEV') {
   baseUrl = 'http://localhost:4000';

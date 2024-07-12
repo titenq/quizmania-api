@@ -2,14 +2,14 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl.js';
-import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+import baseUrl from '../helpers/baseUrl';
+import frontendBaseUrl from '../helpers/frontendBaseUrl';
 
 const router = express.Router();
 
-const xApiKey = process.env.X_API_KEY;
-const xApiKeySecret = process.env.X_API_KEY_SECRET;
-const xClientId = process.env.X_CLIENT_ID;
+const xApiKey = process.env.X_API_KEY as string;
+const xApiKeySecret = process.env.X_API_KEY_SECRET as string;
+const xClientId = process.env.X_CLIENT_ID as string;
 
 const xRedirectUri = `${baseUrl}/x/callback`;
 
@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/callback', async (req, res) => {
-  const code = req.query.code;
+  const code = req.query.code as string;
 
   if (!code) {
     return res.redirect(`${frontendBaseUrl}/login?error=x`);

@@ -1,6 +1,6 @@
 import express from 'express';
 
-const nameSession = process.env.NAME_SESSION;
+const nameSession = process.env.NAME_SESSION as string;
 
 const router = express.Router();
 

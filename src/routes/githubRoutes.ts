@@ -2,11 +2,11 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl.js';
-import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+import baseUrl from '../helpers/baseUrl';
+import frontendBaseUrl from '../helpers/frontendBaseUrl';
 
-const githubClientId = process.env.GITHUB_CLIENT_ID;
-const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+const githubClientId = process.env.GITHUB_CLIENT_ID as string;
+const githubClientSecret = process.env.GITHUB_CLIENT_SECRET as string;
 const githubRedirectUri = `${baseUrl}/github/callback`;
 
 const router = express.Router();

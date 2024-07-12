@@ -8,22 +8,22 @@ import session from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
 
-import baseUrl from './helpers/baseUrl.js';
-import siteOrigin from './helpers/siteOrigin.js';
-import googleRoutes from './routes/googleRoutes.js';
-import facebookRoutes from './routes/facebookRoutes.js';
-import xRoutes from './routes/xRoutes.js';
-import githubRoutes from './routes/githubRoutes.js';
-import logoutRoutes from './routes/logoutRoutes.js';
-import pingRoutes from './routes/pingRoutes.js';
+import baseUrl from './helpers/baseUrl';
+import siteOrigin from './helpers/siteOrigin';
+import googleRoutes from './routes/googleRoutes';
+import facebookRoutes from './routes/facebookRoutes';
+import xRoutes from './routes/xRoutes';
+import githubRoutes from './routes/githubRoutes';
+import logoutRoutes from './routes/logoutRoutes';
+import pingRoutes from './routes/pingRoutes';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-const port = process.env.PORT;
-const secret = process.env.SECRET;
-const nameSession = process.env.NAME_SESSION;
-const nodeEnv = process.env.NODE_ENV;
+const port = process.env.PORT as string;
+const secret = process.env.SECRET as string;
+const nameSession = process.env.NAME_SESSION as string;
+const nodeEnv = process.env.NODE_ENV as string;
 
 const app = express();
 
@@ -61,7 +61,7 @@ app.use(cors({
 }));
 
 app.use('/uploads/facebook',
-  express.static(path.join(__dirname, '..', 'uploads', 'facebook')));
+  express.static(path.join(dirname, '..', '..', 'uploads', 'facebook')));
 
 app.use('/google', googleRoutes);
 app.use('/facebook', facebookRoutes);

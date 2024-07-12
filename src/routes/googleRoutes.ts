@@ -2,13 +2,13 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl.js';
-import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+import baseUrl from '../helpers/baseUrl';
+import frontendBaseUrl from '../helpers/frontendBaseUrl';
 
 const router = express.Router();
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const googleClientId = process.env.GOOGLE_CLIENT_ID as string;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
 
 const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/callback', async (req, res) => {
-  const code = req.query.code;
+  const code = req.query.code as string;
 
   if (!code) {
     return res.redirect(`${frontendBaseUrl}/login?error=google`);

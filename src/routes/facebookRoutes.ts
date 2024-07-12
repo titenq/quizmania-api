@@ -5,14 +5,14 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl.js';
-import frontendBaseUrl from '../helpers/frontendBaseUrl.js';
+import baseUrl from '../helpers/baseUrl';
+import frontendBaseUrl from '../helpers/frontendBaseUrl';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-const facebookAppId = process.env.FACEBOOK_APP_ID;
-const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY;
+const facebookAppId = process.env.FACEBOOK_APP_ID as string;
+const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY as string;
 const facebookAuthUrl = 'https://www.facebook.com/v11.0/dialog/oauth';
 const facebookTokenUrl = 'https://graph.facebook.com/v11.0/oauth/access_token';
 const facebookUserInfoUrl = 'https://graph.facebook.com/me';
@@ -83,7 +83,9 @@ router.post('/user', async (req, res) => {
       responseType: 'stream'
     });
 
-    const photoPath = path.join(__dirname, '..', '..', 'uploads', 'facebook', `${id}.jpg`);
+    const photoPath = path.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
+    console.log(dirname)
+    console.log(photoPath)
     const writer = fs.createWriteStream(photoPath);
 
     photoResponse.data.pipe(writer);

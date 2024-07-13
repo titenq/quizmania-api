@@ -5,6 +5,7 @@ import axios from 'axios';
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
 import { IUser } from '../interfaces/IUser';
+import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const router = express.Router();
 
@@ -70,11 +71,15 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
 
     const userInfo = response.data;
 
+    console.log(userInfo);
+
     const user: IUser = {
       name: userInfo.data.name,
       email: userInfo.data.id,
       picture: userInfo.data.profile_image_url
     };
+
+    await createUserIfNotExists(user);
 
     res.status(200).json(user);
   } catch (error) {

@@ -16,6 +16,7 @@ import xRoutes from './routes/xRoutes';
 import githubRoutes from './routes/githubRoutes';
 import logoutRoutes from './routes/logoutRoutes';
 import pingRoutes from './routes/pingRoutes';
+import userRoutes from './routes/userRoutes';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -66,6 +67,7 @@ app.use('/x', xRoutes);
 app.use('/github', githubRoutes);
 app.use('/logout', logoutRoutes);
 app.use('/ping', pingRoutes);
+app.use('/user', userRoutes);
 
 const pingEndpoint = () => {
   setInterval(async () => {

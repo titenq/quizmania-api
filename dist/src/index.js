@@ -17,6 +17,7 @@ const _xRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/xRoute
 const _githubRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/githubRoutes"));
 const _logoutRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/logoutRoutes"));
 const _pingRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/pingRoutes"));
+const _userRoutes = /*#__PURE__*/ _interop_require_default(require("./routes/userRoutes"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -91,6 +92,7 @@ app.use('/x', _xRoutes.default);
 app.use('/github', _githubRoutes.default);
 app.use('/logout', _logoutRoutes.default);
 app.use('/ping', _pingRoutes.default);
+app.use('/user', _userRoutes.default);
 const pingEndpoint = ()=>{
     setInterval(/*#__PURE__*/ _async_to_generator(function*() {
         try {

@@ -14,6 +14,7 @@ const _express = /*#__PURE__*/ _interop_require_default(require("express"));
 const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
 const _baseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/baseUrl"));
 const _frontendBaseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/frontendBaseUrl"));
+const _createUserIfNotExists = /*#__PURE__*/ _interop_require_default(require("../helpers/createUserIfNotExists"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -115,15 +116,16 @@ router.post('/user', function() {
             const photoPath = _nodepath.default.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
             const writer = _nodefs.default.createWriteStream(photoPath);
             photoResponse.data.pipe(writer);
-            writer.on('finish', ()=>{
+            writer.on('finish', /*#__PURE__*/ _async_to_generator(function*() {
                 const photoUrl = `${_baseUrl.default}/uploads/facebook/${id}.jpg`;
                 const user = {
                     name,
                     email,
                     picture: photoUrl
                 };
+                yield (0, _createUserIfNotExists.default)(user);
                 res.status(200).json(user);
-            });
+            }));
             writer.on('error', (error)=>{
                 return res.redirect(`${_frontendBaseUrl.default}/login?error=facebook`);
             });

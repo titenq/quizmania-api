@@ -5,6 +5,7 @@ import axios from 'axios';
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
 import { IUser } from '../interfaces/IUser';
+import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
@@ -64,6 +65,8 @@ router.post('/user', async(req: Request, res: Response): Promise<IUser | void> =
       email: userInfo.email,
       picture: userInfo.avatar_url
     };
+
+    await createUserIfNotExists(user);
 
     res.status(200).json(user);
   } catch (error) {

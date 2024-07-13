@@ -8,6 +8,7 @@ import axios from 'axios';
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
 import { IUser } from '../interfaces/IUser';
+import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -89,7 +90,7 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
 
     photoResponse.data.pipe(writer);
 
-    writer.on('finish', () => {
+    writer.on('finish', async () => {
       const photoUrl = `${baseUrl}/uploads/facebook/${id}.jpg`;
 
       const user: IUser = {
@@ -97,6 +98,8 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
         email,
         picture: photoUrl
       };
+
+      await createUserIfNotExists(user);
 
       res.status(200).json(user);
     });

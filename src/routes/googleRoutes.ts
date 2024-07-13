@@ -1,10 +1,11 @@
 import 'dotenv/config';
-import express, { Request, Response, Router } from 'express';
-import axios, { AxiosResponse } from 'axios';
+import express, { Request, Response } from 'express';
+import axios from 'axios';
 
 import baseUrl from '../helpers/baseUrl';
 import frontendBaseUrl from '../helpers/frontendBaseUrl';
 import { IUser } from '../interfaces/IUser';
+import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const router = express.Router();
 
@@ -65,6 +66,8 @@ router.post('/user', async (req, res): Promise<IUser | void> => {
       email: userInfo.email,
       picture: userInfo.picture
     };
+
+    await createUserIfNotExists(user);
 
     res.status(200).json(user);
   } catch (error) {

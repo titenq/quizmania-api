@@ -12,6 +12,7 @@ const _express = /*#__PURE__*/ _interop_require_default(require("express"));
 const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
 const _baseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/baseUrl"));
 const _frontendBaseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/frontendBaseUrl"));
+const _createUserIfNotExists = /*#__PURE__*/ _interop_require_default(require("../helpers/createUserIfNotExists"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -98,6 +99,7 @@ router.post('/user', function() {
                 email: userInfo.email,
                 picture: userInfo.avatar_url
             };
+            yield (0, _createUserIfNotExists.default)(user);
             res.status(200).json(user);
         } catch (error) {
             res.redirect(`${_frontendBaseUrl.default}/login?error=github`);

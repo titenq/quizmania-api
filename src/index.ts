@@ -2,49 +2,36 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import 'dotenv/config';
-import express, { Application } from 'express';
-import axios, { AxiosResponse } from 'axios';
-import session from 'express-session';
-import cors from 'cors';
-import helmet from 'helmet';
+import fastify from 'fastify';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyCors from '@fastify/cors';
+import fastifyCookie from '@fastify/cookie';
+import fastifySession from '@fastify/session';
+import fastifyStatic from '@fastify/static';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
+import indexRoute from './routes/indexRoute';
 import baseUrl from './helpers/baseUrl';
 import siteOrigin from './helpers/siteOrigin';
-import googleRoutes from './routes/googleRoutes';
-import facebookRoutes from './routes/facebookRoutes';
-import xRoutes from './routes/xRoutes';
-import githubRoutes from './routes/githubRoutes';
-import logoutRoutes from './routes/logoutRoutes';
-import pingRoutes from './routes/pingRoutes';
-import userRoutes from './routes/userRoutes';
+import pingEndpoint from './helpers/pingEndpoint';
+import errorHandler from './helpers/errorHandler';
+import { fastifySwaggerOptions, fastifySwaggerUiOptions } from './helpers/swaggerOptions';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const { PORT, SECRET, NAME_SESSION, NODE_ENV } = process.env;
 
-const app: Application = express();
+const app = fastify();
 
-app.use(express.json());
-
-app.use(helmet({
+app.register(fastifyHelmet/* , {
   contentSecurityPolicy: false,
   frameguard: false
-}));
+} */);
 
-app.use(session({
-  name: NAME_SESSION,
-  secret: SECRET!,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: NODE_ENV === 'PROD',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 1 dia
-  }
-}));
-
-app.use(cors({
+app.register(fastifyCors, {
   origin: siteOrigin,
   credentials: true,
   allowedHeaders: [
@@ -56,33 +43,70 @@ app.use(cors({
     'google_token',
     'x_token'
   ]
-}));
+});
 
-app.use('/uploads/facebook',
-  express.static(path.join(dirname, '..', '..', 'uploads', 'facebook')));
+app.register(fastifyCookie);
 
-app.use('/google', googleRoutes);
-app.use('/facebook', facebookRoutes);
-app.use('/x', xRoutes);
-app.use('/github', githubRoutes);
-app.use('/logout', logoutRoutes);
-app.use('/ping', pingRoutes);
-app.use('/user', userRoutes);
+app.register(fastifySession, {
+  secret: SECRET!/* ,
+  cookie: {
+    secure: NODE_ENV === 'PROD',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 1 dia
+  },
+  saveUninitialized: false,
+  resave: false,
+  name: NAME_SESSION
+ */});
 
-const pingEndpoint = () => {
-  setInterval(async () => {
-    try {
-      const response: AxiosResponse<string, string> = await axios.get(`${baseUrl}/ping`);
-      
-      console.log('Ping response:', response.data);
-    } catch (err) {
-      console.error('Erro ao fazer ping:', err);
-    }
-  }, 840000); // 14 minutos
-};
+app.addHook('preHandler', (request, reply, next) => {
+  request.session.cookie.httpOnly = true;
+  request.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 1 dia
+  request.session.cookie.secure = NODE_ENV === 'PROD';
 
-app.listen(PORT , () => {
-  console.log(`Server running on ${baseUrl}`);
+  next();
+})
+
+app.register(fastifyStatic, {
+  root: path.join(dirname, '..', '..', 'uploads', 'facebook'),
+  prefix: '/uploads/facebook/',
+});
+
+app.register(fastifySwagger, fastifySwaggerOptions);
+app.register(fastifySwaggerUi, fastifySwaggerUiOptions);
+
+/* app.register(googleRoutes, { prefix: '/google' });
+app.register(facebookRoutes, { prefix: '/facebook' });
+app.register(xRoutes, { prefix: '/x' });
+app.register(githubRoutes, { prefix: '/github' });
+app.register(logoutRoutes, { prefix: '/logout' });
+app.register(pingRoutes, { prefix: '/ping' });
+app.register(userRoutes, { prefix: '/user' }); */
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+app.setErrorHandler(errorHandler);
+
+// app.register(pingRoutes, { prefix: '/ping' });
+
+const startServer = async () => {
+  await indexRoute(app);
+
+  await app.listen({
+    port: Number(PORT),
+    host: '0.0.0.0'
+  });
 
   pingEndpoint();
-});
+};
+
+try {
+  startServer();
+
+  console.log(`Server started in ${baseUrl}`);
+  console.log(`API Doc: ${baseUrl}/docs`);
+} catch (err) {
+  app.log.error(err);
+
+  process.exit(1);
+}

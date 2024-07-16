@@ -34,5 +34,5 @@ const UserSchema = new _db.default.Schema({
 }, {
     collection: 'users'
 });
-const User = _db.default.model('User', UserSchema);
-const _default = User;
+const UserModel = _db.default.model('User', UserSchema);
+const _default = UserModel;

@@ -7,8 +7,6 @@ Object.defineProperty(exports, "default", {
         return _default;
     }
 });
-const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
-const _baseUrl = /*#__PURE__*/ _interop_require_default(require("./baseUrl"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -38,32 +36,21 @@ function _async_to_generator(fn) {
         });
     };
 }
-function _interop_require_default(obj) {
-    return obj && obj.__esModule ? obj : {
-        default: obj
-    };
-}
-const createUserIfNotExists = function() {
-    var _ref = _async_to_generator(function*(user) {
-        try {
-            const userExists = yield _axios.default.get(`${_baseUrl.default}/users/${user.email}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!userExists.data) {
-                yield _axios.default.post(`${_baseUrl.default}/user`, user, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+const pingRoute = function() {
+    var _ref = _async_to_generator(function*(fastify, options) {
+        fastify.get('/ping', function() {
+            var _ref = _async_to_generator(function*(request, reply) {
+                return reply.status(200).send({
+                    ping: 'pong'
                 });
-            }
-        } catch (error) {
-            throw error;
-        }
+            });
+            return function(request, reply) {
+                return _ref.apply(this, arguments);
+            };
+        }());
     });
-    return function createUserIfNotExists(user) {
+    return function pingRoute(fastify, options) {
         return _ref.apply(this, arguments);
     };
 }();
-const _default = createUserIfNotExists;
+const _default = pingRoute;

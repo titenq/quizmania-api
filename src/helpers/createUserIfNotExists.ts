@@ -5,7 +5,7 @@ import baseUrl from './baseUrl';
 
 const createUserIfNotExists = async (user: IUser): Promise<void> => {
   try {
-    const userExists = await axios.get<IUser>(`${baseUrl}/user/${user.email}`, {
+    const userExists = await axios.get(`${baseUrl}/users/${user.email}`, {
       headers: {
         'Content-Type': 'application/json'
       }

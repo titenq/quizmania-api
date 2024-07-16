@@ -7,8 +7,7 @@ Object.defineProperty(exports, "default", {
         return _default;
     }
 });
-const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
-const _baseUrl = /*#__PURE__*/ _interop_require_default(require("./baseUrl"));
+const _UserModel = /*#__PURE__*/ _interop_require_default(require("../models/UserModel"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -43,27 +42,38 @@ function _interop_require_default(obj) {
         default: obj
     };
 }
-const createUserIfNotExists = function() {
-    var _ref = _async_to_generator(function*(user) {
-        try {
-            const userExists = yield _axios.default.get(`${_baseUrl.default}/users/${user.email}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!userExists.data) {
-                yield _axios.default.post(`${_baseUrl.default}/user`, user, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+const userService = {
+    createUser: function() {
+        var _ref = _async_to_generator(function*(user) {
+            try {
+                const userCreated = yield _UserModel.default.create(user);
+                return userCreated;
+            } catch (error) {
+                return {
+                    error: 'Erro ao criar usuário'
+                };
             }
-        } catch (error) {
-            throw error;
-        }
-    });
-    return function createUserIfNotExists(user) {
-        return _ref.apply(this, arguments);
-    };
-}();
-const _default = createUserIfNotExists;
+        });
+        return function(user) {
+            return _ref.apply(this, arguments);
+        };
+    }(),
+    getUserByEmail: function() {
+        var _ref = _async_to_generator(function*(email) {
+            try {
+                const user = yield _UserModel.default.findOne({
+                    email
+                });
+                return user;
+            } catch (error) {
+                return {
+                    error: 'Erro ao buscar usuário por e-mail'
+                };
+            }
+        });
+        return function(email) {
+            return _ref.apply(this, arguments);
+        };
+    }()
+};
+const _default = userService;

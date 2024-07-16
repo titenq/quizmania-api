@@ -43,27 +43,15 @@ function _interop_require_default(obj) {
         default: obj
     };
 }
-const createUserIfNotExists = function() {
-    var _ref = _async_to_generator(function*(user) {
+const pingEndpoint = ()=>{
+    setInterval(/*#__PURE__*/ _async_to_generator(function*() {
         try {
-            const userExists = yield _axios.default.get(`${_baseUrl.default}/users/${user.email}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!userExists.data) {
-                yield _axios.default.post(`${_baseUrl.default}/user`, user, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            }
-        } catch (error) {
-            throw error;
+            console.log(`${_baseUrl.default}/ping`);
+            const response = yield _axios.default.get(`${_baseUrl.default}/ping`);
+            console.log('Ping response:', response.data);
+        } catch (err) {
+            console.error('Erro ao fazer ping:' /* , err */ );
         }
-    });
-    return function createUserIfNotExists(user) {
-        return _ref.apply(this, arguments);
-    };
-}();
-const _default = createUserIfNotExists;
+    }), 840000); // 14 minutos
+};
+const _default = pingEndpoint;

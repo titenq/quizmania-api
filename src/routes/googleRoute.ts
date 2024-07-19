@@ -6,7 +6,10 @@ import { IUser } from '../interfaces/userInterface';
 import apiBaseUrl from '../helpers/apiBaseUrl';
 import webBaseUrl from '../helpers/webBaseUrl';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
-import { IGoogleCallbackRequest, IGoogleUserRequest } from '../interfaces/googleInterface';
+import {
+  IGoogleCallbackRequest,
+  IGoogleUserRequest
+} from '../interfaces/googleInterface';
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 

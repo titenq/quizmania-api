@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 
 import apiBaseUrl from './apiBaseUrl';
-import { IPingResponse } from '../interfaces/IPingResponse';
+import { IPingResponse } from '../interfaces/pingInterface';
 
 const pingEndpoint = () => {
   setInterval(async () => {

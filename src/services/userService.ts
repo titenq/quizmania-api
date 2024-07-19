@@ -1,5 +1,5 @@
 import UserModel from '../models/UserModel';
-import { IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/userInterface';
 
 const userService = {
   createUser: async (user: IUser) => {

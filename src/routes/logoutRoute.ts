@@ -1,7 +1,7 @@
 import { promisify } from 'node:util';
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { ILogoutResponse } from '../interfaces/ILogoutResponse';
+import { ILogoutResponse } from '../interfaces/logoutInterface';
 
 const { NAME_SESSION } = process.env;
 

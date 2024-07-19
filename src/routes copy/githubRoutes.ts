@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import apiBaseUrl from '../helpers/apiBaseUrl';
 import webBaseUrl from '../helpers/webBaseUrl';
-import { IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/userInterface';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const githubClientId = process.env.GITHUB_CLIENT_ID;

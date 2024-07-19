@@ -2,12 +2,11 @@ import 'dotenv/config';
 import axios from 'axios';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/userInterface';
 import apiBaseUrl from '../helpers/apiBaseUrl';
 import webBaseUrl from '../helpers/webBaseUrl';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
-import { IGoogleCallbackRequest } from '../interfaces/IGoogleCallbackRequest';
-import { IGoogleUserRequest } from '../interfaces/IGoogleUserRequest';
+import { IGoogleCallbackRequest, IGoogleUserRequest } from '../interfaces/googleInterface';
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 

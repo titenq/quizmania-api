@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { IPingResponse } from '../interfaces/IPingResponse';
+import { IPingResponse } from '../interfaces/pingInterface';
 
 const pingRoute = async (fastify: FastifyInstance) => {
   fastify.get('/ping',

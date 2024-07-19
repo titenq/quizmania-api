@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { IUser } from '../interfaces/IUser';
+import { IUser } from '../interfaces/userInterface';
 import apiBaseUrl from './apiBaseUrl';
 
 const createUserIfNotExists = async (user: IUser): Promise<void> => {

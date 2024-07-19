@@ -22,9 +22,9 @@ const googleRoute = async (fastify: FastifyInstance) => {
     },
     async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
       try {
-        reply.status(200).redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
+        reply.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
       } catch (error) {
-        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
+        return reply.redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );
@@ -41,9 +41,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
         const code = request.query.code;
 
         if (!code) {
-          reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
-
-          return;
+          return reply.redirect(`${webBaseUrl}/login?error=google`);
         }
 
         const tokenResponse = await axios.post(googleTokenUrl, new URLSearchParams({
@@ -60,9 +58,9 @@ const googleRoute = async (fastify: FastifyInstance) => {
 
         const token = tokenResponse.data.access_token;
 
-        reply.status(200).redirect(`${webBaseUrl}/auth/google/callback?token=${token}`);
+        reply.redirect(`${webBaseUrl}/auth/google/callback?token=${token}`);
       } catch (error) {
-        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
+        return reply.redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );
@@ -79,9 +77,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
         const token = request.headers.google_token;
 
         if (!token) {
-          reply.status(400).redirect(`${webBaseUrl}/login?error=token`);
-
-          return;
+          return reply.redirect(`${webBaseUrl}/login?error=token`);
         }
 
         const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
@@ -97,7 +93,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
 
         reply.status(200).send(user);
       } catch (error) {
-        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
+        return reply.redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );

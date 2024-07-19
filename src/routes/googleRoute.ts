@@ -3,8 +3,8 @@ import axios from 'axios';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { IUser } from '../interfaces/IUser';
-import baseUrl from '../helpers/baseUrl';
-import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import apiBaseUrl from '../helpers/apiBaseUrl';
+import webBaseUrl from '../helpers/webBaseUrl';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
 import { IGoogleCallbackRequest } from '../interfaces/IGoogleCallbackRequest';
 import { IGoogleUserRequest } from '../interfaces/IGoogleUserRequest';
@@ -13,7 +13,7 @@ const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 
 const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
-const googleRedirectUri = `${baseUrl}/google/callback`;
+const googleRedirectUri = `${apiBaseUrl}/google/callback`;
 
 const googleRoute = async (fastify: FastifyInstance) => {
   fastify.get('/google',
@@ -24,7 +24,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
       try {
         reply.status(200).redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
       } catch (error) {
-        reply.status(400).redirect(`${frontendBaseUrl}/login?error=google`);
+        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );
@@ -41,7 +41,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
         const code = request.query.code;
 
         if (!code) {
-          reply.status(400).redirect(`${frontendBaseUrl}/login?error=google`);
+          reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
 
           return;
         }
@@ -60,9 +60,9 @@ const googleRoute = async (fastify: FastifyInstance) => {
 
         const token = tokenResponse.data.access_token;
 
-        reply.status(200).redirect(`${frontendBaseUrl}/auth/google/callback?token=${token}`);
+        reply.status(200).redirect(`${webBaseUrl}/auth/google/callback?token=${token}`);
       } catch (error) {
-        reply.status(400).redirect(`${frontendBaseUrl}/login?error=google`);
+        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );
@@ -79,7 +79,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
         const token = request.headers.google_token;
 
         if (!token) {
-          reply.status(400).redirect(`${frontendBaseUrl}/login?error=token`);
+          reply.status(400).redirect(`${webBaseUrl}/login?error=token`);
 
           return;
         }
@@ -97,7 +97,7 @@ const googleRoute = async (fastify: FastifyInstance) => {
 
         reply.status(200).send(user);
       } catch (error) {
-        reply.status(400).redirect(`${frontendBaseUrl}/login?error=google`);
+        reply.status(400).redirect(`${webBaseUrl}/login?error=google`);
       }
     }
   );

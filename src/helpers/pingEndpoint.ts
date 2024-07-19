@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
 
-import baseUrl from './baseUrl';
+import apiBaseUrl from './apiBaseUrl';
 import { IPingResponse } from '../interfaces/IPingResponse';
 
 const pingEndpoint = () => {
   setInterval(async () => {
     try {
-      const response: AxiosResponse<IPingResponse> = await axios.get(`${baseUrl}/ping`);
+      const response: AxiosResponse<IPingResponse> = await axios.get(`${apiBaseUrl}/ping`);
 
       console.log('Ping response:', response.data);
     } catch (err) {

@@ -13,7 +13,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
 import indexRoute from './routes/indexRoute';
-import baseUrl from './helpers/baseUrl';
+import apiBaseUrl from './helpers/apiBaseUrl';
 import siteOrigin from './helpers/siteOrigin';
 import pingEndpoint from './helpers/pingEndpoint';
 import errorHandler from './helpers/errorHandler';
@@ -81,8 +81,8 @@ const startServer = async () => {
 try {
   startServer();
 
-  console.log(`Server started in ${baseUrl}`);
-  console.log(`API Doc: ${baseUrl}/docs`);
+  console.log(`Server started in ${apiBaseUrl}`);
+  console.log(`API Doc: ${apiBaseUrl}/docs`);
 } catch (error) {
   console.error(error);
 }

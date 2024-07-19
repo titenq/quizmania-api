@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl';
-import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import apiBaseUrl from '../helpers/apiBaseUrl';
+import webBaseUrl from '../helpers/webBaseUrl';
 import { IUser } from '../interfaces/IUser';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
@@ -18,7 +18,7 @@ const facebookSecretKey = process.env.FACEBOOK_SECRET_KEY;
 const facebookAuthUrl = 'https://www.facebook.com/v11.0/dialog/oauth';
 const facebookTokenUrl = 'https://graph.facebook.com/v11.0/oauth/access_token';
 const facebookUserInfoUrl = 'https://graph.facebook.com/me';
-const facebookRedirectUri = `${baseUrl}/facebook/callback`;
+const facebookRedirectUri = `${apiBaseUrl}/facebook/callback`;
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.get('/callback', async (req: Request, res: Response): Promise<void> => {
   const code = req.query.code;
 
   if (!code) {
-    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
+    return res.redirect(`${webBaseUrl}/login?error=facebook`);
   }
 
   try {
@@ -58,9 +58,9 @@ router.get('/callback', async (req: Request, res: Response): Promise<void> => {
 
     const token = tokenResponse.data.access_token;
 
-    return res.redirect(`${frontendBaseUrl}/auth/facebook/callback?token=${token}`);
+    return res.redirect(`${webBaseUrl}/auth/facebook/callback?token=${token}`);
   } catch (error) {
-    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
+    return res.redirect(`${webBaseUrl}/login?error=facebook`);
   }
 });
 
@@ -69,7 +69,7 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
     const token = req.headers.facebook_token;
 
     if (!token) {
-      return res.redirect(`${frontendBaseUrl}/login?error=token`);
+      return res.redirect(`${webBaseUrl}/login?error=token`);
     }
 
     const response = await axios.get(`${facebookUserInfoUrl}?fields=id,name,email,picture.type(large)&access_token=${token}`);
@@ -91,7 +91,7 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
     photoResponse.data.pipe(writer);
 
     writer.on('finish', async () => {
-      const photoUrl = `${baseUrl}/uploads/facebook/${id}.jpg`;
+      const photoUrl = `${apiBaseUrl}/uploads/facebook/${id}.jpg`;
 
       const user: IUser = {
         name,
@@ -105,10 +105,10 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
     });
 
     writer.on('error', error => {
-      return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
+      return res.redirect(`${webBaseUrl}/login?error=facebook`);
     });
   } catch (error) {
-    return res.redirect(`${frontendBaseUrl}/login?error=facebook`);
+    return res.redirect(`${webBaseUrl}/login?error=facebook`);
   }
 });
 

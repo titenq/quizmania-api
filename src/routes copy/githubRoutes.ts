@@ -2,14 +2,14 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 
-import baseUrl from '../helpers/baseUrl';
-import frontendBaseUrl from '../helpers/frontendBaseUrl';
+import apiBaseUrl from '../helpers/apiBaseUrl';
+import webBaseUrl from '../helpers/webBaseUrl';
 import { IUser } from '../interfaces/IUser';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
 
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
-const githubRedirectUri = `${baseUrl}/github/callback`;
+const githubRedirectUri = `${apiBaseUrl}/github/callback`;
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.get('/callback', async (req: Request, res: Response): Promise<void> => {
     const code = req.query.code;
 
     if (!code) {
-      return res.redirect(`${frontendBaseUrl}/login?error=github`);
+      return res.redirect(`${webBaseUrl}/login?error=github`);
     }
 
     const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
@@ -38,18 +38,18 @@ router.get('/callback', async (req: Request, res: Response): Promise<void> => {
 
     const accessToken = tokenResponse.data.access_token;
 
-    res.redirect(`${frontendBaseUrl}/auth/github/callback?token=${accessToken}`);
+    res.redirect(`${webBaseUrl}/auth/github/callback?token=${accessToken}`);
   } catch (error) {
-    res.redirect(`${frontendBaseUrl}/login?error=github`);
+    res.redirect(`${webBaseUrl}/login?error=github`);
   }
 });
 
-router.post('/user', async(req: Request, res: Response): Promise<IUser | void> => {
+router.post('/user', async (req: Request, res: Response): Promise<IUser | void> => {
   try {
     const token = req.headers.github_token;
 
     if (!token) {
-      return res.redirect(`${frontendBaseUrl}/login?error=token`);
+      return res.redirect(`${webBaseUrl}/login?error=token`);
     }
 
     const userResponse = await axios.get('https://api.github.com/user', {
@@ -70,7 +70,7 @@ router.post('/user', async(req: Request, res: Response): Promise<IUser | void> =
 
     res.status(200).json(user);
   } catch (error) {
-    res.redirect(`${frontendBaseUrl}/login?error=github`);
+    res.redirect(`${webBaseUrl}/login?error=github`);
   }
 });
 

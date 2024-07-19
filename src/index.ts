@@ -45,14 +45,14 @@ app.register(fastifyCors, {
 
 app.register(fastifyCookie);
 
-app.register(fastifySession, { secret: SECRET! });
-
-app.addHook('preHandler', (request, reply, done) => {
-  request.session.cookie.httpOnly = true;
-  request.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 1 dia
-  request.session.cookie.secure = NODE_ENV === 'PROD';
-
-  done();
+app.register(fastifySession, {
+  secret: SECRET!,
+  cookieName: NAME_SESSION,
+  cookie: {
+    secure: NODE_ENV === 'PROD',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 1 dia
+  }
 });
 
 app.register(fastifyStatic, {

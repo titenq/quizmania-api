@@ -37,19 +37,19 @@ function _async_to_generator(fn) {
     };
 }
 const pingRoute = function() {
-    var _ref = _async_to_generator(function*(fastify, options) {
-        fastify.get('/ping', function() {
-            var _ref = _async_to_generator(function*(request, reply) {
-                return reply.status(200).send({
-                    ping: 'pong'
-                });
-            });
-            return function(request, reply) {
-                return _ref.apply(this, arguments);
+    var _ref = _async_to_generator(function*(fastify) {
+        fastify.get('/ping', {
+            schema: {
+                hide: true
+            }
+        }, (request, reply)=>{
+            const response = {
+                ping: 'pong'
             };
-        }());
+            return reply.status(200).send(response);
+        });
     });
-    return function pingRoute(fastify, options) {
+    return function pingRoute(fastify) {
         return _ref.apply(this, arguments);
     };
 }();

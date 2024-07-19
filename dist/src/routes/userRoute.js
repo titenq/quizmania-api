@@ -7,6 +7,7 @@ import { IUser } from '../interfaces/IUser';
 import { IUserResponse } from '../interfaces/IUserResponse';
 import User from '../models/UserModel';
 import { IGenericError } from '../interfaces/IGenericError';
+import apiKeyDecorator from '../decorators/apiKeyDecorator';
 
 const router = express.Router();
 
@@ -71,18 +72,28 @@ function _interop_require_default(obj) {
     };
 }
 const userRoute = function() {
-    var _ref = _async_to_generator(function*(fastify, options) {
+    var _ref = _async_to_generator(function*(fastify) {
         fastify.withTypeProvider().post('/users', {
             schema: _userSchema.userCreateSchema
         }, function() {
             var _ref = _async_to_generator(function*(request, reply) {
                 try {
                     const { name, email, picture } = request.body;
+                    const { api_key } = request.headers;
+                    const { apiKey } = process.env;
+                    if (api_key !== apiKey) {
+                        const error = {
+                            error: 'api_key inválida'
+                        };
+                        reply.status(401).send(error);
+                        return;
+                    }
                     const userExists = yield _userService.default.getUserByEmail(email);
                     if (userExists) {
-                        return reply.status(409).send({
+                        const error = {
                             error: 'E-mail já cadastrado'
-                        });
+                        };
+                        return reply.status(409).send(error);
                     }
                     const user = yield _userService.default.createUser({
                         name,
@@ -120,7 +131,7 @@ const userRoute = function() {
             };
         }());
     });
-    return function userRoute(fastify, options) {
+    return function userRoute(fastify) {
         return _ref.apply(this, arguments);
     };
 }();

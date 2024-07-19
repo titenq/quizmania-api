@@ -5,24 +5,39 @@ import errorHandler from '../helpers/errorHandler';
 import userService from '../services/userService';
 import { userCreateSchema, userGetByEmailSchema } from '../schemas/userSchema';
 import { IUser } from '../interfaces/IUser';
+import { IGenericError } from '../interfaces/IGenericError';
+import { IUserHeaders } from '../interfaces/IUserHeaders';
 
-const userRoute = async (fastify: FastifyInstance, options: any) => {
+const userRoute = async (fastify: FastifyInstance) => {
   fastify.withTypeProvider<ZodTypeProvider>()
     .post('/users',
-    { schema: userCreateSchema },
+      {
+        schema: userCreateSchema,
+      },
     async (
-      request: FastifyRequest<{ Body: IUser }>,
+      request: FastifyRequest<{ Body: IUser, Headers: IUserHeaders }>,
       reply: FastifyReply
     ) => {
       try {
         const { name, email, picture } = request.body;
+        const { api_key } = request.headers;
+
+        const { apiKey } = process.env; 
+
+        if (api_key !== apiKey) {
+          const error: IGenericError = { error: 'api_key inválida' };
+
+          reply.status(401).send(error);
+
+          return;
+        }
 
         const userExists = await userService.getUserByEmail(email);
 
         if (userExists) {
-          return reply.status(409).send({
-            error: 'E-mail já cadastrado',
-          });
+          const error: IGenericError = { error: 'E-mail já cadastrado' };
+
+          return reply.status(409).send(error);
         }
 
         const user = await userService.createUser({
@@ -72,6 +87,7 @@ import { IUser } from '../interfaces/IUser';
 import { IUserResponse } from '../interfaces/IUserResponse';
 import User from '../models/UserModel';
 import { IGenericError } from '../interfaces/IGenericError';
+import apiKeyDecorator from '../decorators/apiKeyDecorator';
 
 const router = express.Router();
 

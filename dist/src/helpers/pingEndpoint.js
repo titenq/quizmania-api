@@ -46,11 +46,10 @@ function _interop_require_default(obj) {
 const pingEndpoint = ()=>{
     setInterval(/*#__PURE__*/ _async_to_generator(function*() {
         try {
-            console.log(`${_baseUrl.default}/ping`);
             const response = yield _axios.default.get(`${_baseUrl.default}/ping`);
             console.log('Ping response:', response.data);
         } catch (err) {
-            console.error('Erro ao fazer ping:' /* , err */ );
+            console.error('Erro ao fazer ping:', err);
         }
     }), 840000); // 14 minutos
 };

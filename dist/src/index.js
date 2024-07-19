@@ -57,10 +57,7 @@ const filename = (0, _nodeurl.fileURLToPath)(require("url").pathToFileURL(__file
 const dirname = _nodepath.default.dirname(filename);
 const { PORT, SECRET, NAME_SESSION, NODE_ENV } = process.env;
 const app = (0, _fastify.default)();
-app.register(_helmet /* , {
-  contentSecurityPolicy: false,
-  frameguard: false
-} */ .default);
+app.register(_helmet.default);
 app.register(_cors.default, {
     origin: _siteOrigin.default,
     credentials: true,
@@ -68,6 +65,7 @@ app.register(_cors.default, {
         'Content-Type',
         'Authorization',
         'Access-Control-Allow-Origin',
+        'api_key',
         'facebook_token',
         'github_token',
         'google_token',
@@ -78,11 +76,11 @@ app.register(_cookie.default);
 app.register(_session.default, {
     secret: SECRET
 });
-app.addHook('preHandler', (request, reply, next)=>{
+app.addHook('preHandler', (request, reply, done)=>{
     request.session.cookie.httpOnly = true;
     request.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 1 dia
     request.session.cookie.secure = NODE_ENV === 'PROD';
-    next();
+    done();
 });
 app.register(_static.default, {
     root: _nodepath.default.join(dirname, '..', '..', 'uploads', 'facebook'),
@@ -90,16 +88,9 @@ app.register(_static.default, {
 });
 app.register(_swagger.default, _swaggerOptions.fastifySwaggerOptions);
 app.register(_swaggerui.default, _swaggerOptions.fastifySwaggerUiOptions);
-/* app.register(googleRoutes, { prefix: '/google' });
-app.register(facebookRoutes, { prefix: '/facebook' });
-app.register(xRoutes, { prefix: '/x' });
-app.register(githubRoutes, { prefix: '/github' });
-app.register(logoutRoutes, { prefix: '/logout' });
-app.register(pingRoutes, { prefix: '/ping' });
-app.register(userRoutes, { prefix: '/user' }); */ app.setValidatorCompiler(_fastifytypeproviderzod.validatorCompiler);
+app.setValidatorCompiler(_fastifytypeproviderzod.validatorCompiler);
 app.setSerializerCompiler(_fastifytypeproviderzod.serializerCompiler);
 app.setErrorHandler(_errorHandler.default);
-// app.register(pingRoutes, { prefix: '/ping' });
 const startServer = function() {
     var _ref = _async_to_generator(function*() {
         yield (0, _indexRoute.default)(app);
@@ -117,7 +108,6 @@ try {
     startServer();
     console.log(`Server started in ${_baseUrl.default}`);
     console.log(`API Doc: ${_baseUrl.default}/docs`);
-} catch (err) {
-    app.log.error(err);
-    process.exit(1);
+} catch (error) {
+    console.error(error);
 }

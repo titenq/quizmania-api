@@ -6,7 +6,7 @@
   "scripts": {
     "build": "swc src --out-dir dist",
     "start": "node dist/src/index.js",
-    "dev": "concurrently \"swc src --out-dir dist --watch\" \"node dist/src/index.js\""
+    "dev": "concurrently \"swc src --out-dir dist --watch\" \"node --watch dist/src/index.js\""
   },
   "keywords": [],
   "author": "",

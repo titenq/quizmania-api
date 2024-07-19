@@ -26,10 +26,7 @@ const { PORT, SECRET, NAME_SESSION, NODE_ENV } = process.env;
 
 const app = fastify();
 
-app.register(fastifyHelmet/* , {
-  contentSecurityPolicy: false,
-  frameguard: false
-} */);
+app.register(fastifyHelmet);
 
 app.register(fastifyCors, {
   origin: siteOrigin,
@@ -38,6 +35,7 @@ app.register(fastifyCors, {
     'Content-Type',
     'Authorization',
     'Access-Control-Allow-Origin',
+    'api_key',
     'facebook_token',
     'github_token',
     'google_token',
@@ -47,25 +45,15 @@ app.register(fastifyCors, {
 
 app.register(fastifyCookie);
 
-app.register(fastifySession, {
-  secret: SECRET!/* ,
-  cookie: {
-    secure: NODE_ENV === 'PROD',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 1 dia
-  },
-  saveUninitialized: false,
-  resave: false,
-  name: NAME_SESSION
- */});
+app.register(fastifySession, { secret: SECRET! });
 
-app.addHook('preHandler', (request, reply, next) => {
+app.addHook('preHandler', (request, reply, done) => {
   request.session.cookie.httpOnly = true;
   request.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 1 dia
   request.session.cookie.secure = NODE_ENV === 'PROD';
 
-  next();
-})
+  done();
+});
 
 app.register(fastifyStatic, {
   root: path.join(dirname, '..', '..', 'uploads', 'facebook'),
@@ -75,19 +63,9 @@ app.register(fastifyStatic, {
 app.register(fastifySwagger, fastifySwaggerOptions);
 app.register(fastifySwaggerUi, fastifySwaggerUiOptions);
 
-/* app.register(googleRoutes, { prefix: '/google' });
-app.register(facebookRoutes, { prefix: '/facebook' });
-app.register(xRoutes, { prefix: '/x' });
-app.register(githubRoutes, { prefix: '/github' });
-app.register(logoutRoutes, { prefix: '/logout' });
-app.register(pingRoutes, { prefix: '/ping' });
-app.register(userRoutes, { prefix: '/user' }); */
-
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 app.setErrorHandler(errorHandler);
-
-// app.register(pingRoutes, { prefix: '/ping' });
 
 const startServer = async () => {
   await indexRoute(app);
@@ -105,8 +83,6 @@ try {
 
   console.log(`Server started in ${baseUrl}`);
   console.log(`API Doc: ${baseUrl}/docs`);
-} catch (err) {
-  app.log.error(err);
-
-  process.exit(1);
+} catch (error) {
+  console.error(error);
 }

@@ -1,85 +1,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-Object.defineProperty(exports, "default" /* import 'dotenv/config';
-import express, { Request, Response } from 'express';
-import axios from 'axios';
-
-import baseUrl from '../helpers/baseUrl';
-import frontendBaseUrl from '../helpers/frontendBaseUrl';
-import { IUser } from '../interfaces/IUser';
-import createUserIfNotExists from '../helpers/createUserIfNotExists';
-
-const router = express.Router();
-
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-const googleTokenUrl = 'https://oauth2.googleapis.com/token';
-const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
-const googleRedirectUri = `${baseUrl}/google/callback`;
-
-router.get('/', (req: Request, res: Response): void => {
-  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
-});
-
-router.get('/callback', async (req: Request, res: Response): Promise<void> => {
-  const code = req.query.code;
-
-  if (!code) {
-    return res.redirect(`${frontendBaseUrl}/login?error=google`);
-  }
-
-  try {
-    const tokenResponse = await axios.post(googleTokenUrl, new URLSearchParams({
-      code,
-      client_id: googleClientId,
-      client_secret: googleClientSecret,
-      redirect_uri: googleRedirectUri,
-      grant_type: 'authorization_code'
-    } as Record<string, string>),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }
-    );
-
-    const token = tokenResponse.data.access_token;
-
-    res.redirect(`${frontendBaseUrl}/auth/google/callback?token=${token}`);
-  } catch (error) {
-    res.redirect(`${frontendBaseUrl}/login?error=google`);
-  }
-});
-
-router.post('/user', async (req, res): Promise<IUser | void> => {
-  try {
-    const token = req.headers.google_token;
-
-    if (!token) {
-      return res.redirect(`${frontendBaseUrl}/login?error=token`);
-    }
-
-    const userInfoResponse = await axios.get(`${googleUserInfoUrl}?access_token=${token}`);
-    const userInfo = await userInfoResponse.data;
-
-    const user: IUser = {
-      name: userInfo.name,
-      email: userInfo.email,
-      picture: userInfo.picture
-    };
-
-    await createUserIfNotExists(user);
-
-    res.status(200).json(user);
-  } catch (error) {
-    res.redirect(`${frontendBaseUrl}/login?error=google`);
-  }
-});
-
-export default router;
- */ , {
+Object.defineProperty(exports, "default", {
     enumerable: true,
     get: function() {
         return _default;
@@ -87,7 +9,6 @@ export default router;
 });
 require("dotenv/config");
 const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
-const _errorHandler = /*#__PURE__*/ _interop_require_default(require("../helpers/errorHandler"));
 const _baseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/baseUrl"));
 const _frontendBaseUrl = /*#__PURE__*/ _interop_require_default(require("../helpers/frontendBaseUrl"));
 const _createUserIfNotExists = /*#__PURE__*/ _interop_require_default(require("../helpers/createUserIfNotExists"));
@@ -130,25 +51,34 @@ const googleTokenUrl = 'https://oauth2.googleapis.com/token';
 const googleUserInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
 const googleRedirectUri = `${_baseUrl.default}/google/callback`;
 const googleRoute = function() {
-    var _ref = _async_to_generator(function*(fastify, options) {
-        fastify.withTypeProvider().get('/google', function() {
+    var _ref = _async_to_generator(function*(fastify) {
+        fastify.get('/google', {
+            schema: {
+                hide: true
+            }
+        }, function() {
             var _ref = _async_to_generator(function*(request, reply) {
                 try {
-                    reply.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
+                    reply.status(200).redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${googleRedirectUri}&response_type=code&scope=openid%20profile%20email`);
                 } catch (error) {
-                    (0, _errorHandler.default)(error, request, reply);
+                    reply.status(400).redirect(`${_frontendBaseUrl.default}/login?error=google`);
                 }
             });
             return function(request, reply) {
                 return _ref.apply(this, arguments);
             };
         }());
-        fastify.withTypeProvider().get('/google/callback', function() {
+        fastify.get('/google/callback', {
+            schema: {
+                hide: true
+            }
+        }, function() {
             var _ref = _async_to_generator(function*(request, reply) {
                 try {
                     const code = request.query.code;
                     if (!code) {
-                        return reply.redirect(`${_frontendBaseUrl.default}/login?error=google`);
+                        reply.status(400).redirect(`${_frontendBaseUrl.default}/login?error=google`);
+                        return;
                     }
                     const tokenResponse = yield _axios.default.post(googleTokenUrl, new URLSearchParams({
                         code,
@@ -162,21 +92,26 @@ const googleRoute = function() {
                         }
                     });
                     const token = tokenResponse.data.access_token;
-                    reply.redirect(`${_frontendBaseUrl.default}/auth/google/callback?token=${token}`);
+                    reply.status(200).redirect(`${_frontendBaseUrl.default}/auth/google/callback?token=${token}`);
                 } catch (error) {
-                    reply.redirect(`${_frontendBaseUrl.default}/login?error=google`);
+                    reply.status(400).redirect(`${_frontendBaseUrl.default}/login?error=google`);
                 }
             });
             return function(request, reply) {
                 return _ref.apply(this, arguments);
             };
         }());
-        fastify.withTypeProvider().post('/google/user', function() {
+        fastify.post('/google/user', {
+            schema: {
+                hide: true
+            }
+        }, function() {
             var _ref = _async_to_generator(function*(request, reply) {
                 try {
                     const token = request.headers.google_token;
                     if (!token) {
-                        return reply.redirect(`${_frontendBaseUrl.default}/login?error=token`);
+                        reply.status(400).redirect(`${_frontendBaseUrl.default}/login?error=token`);
+                        return;
                     }
                     const userInfoResponse = yield _axios.default.get(`${googleUserInfoUrl}?access_token=${token}`);
                     const userInfo = yield userInfoResponse.data;
@@ -188,7 +123,7 @@ const googleRoute = function() {
                     yield (0, _createUserIfNotExists.default)(user);
                     reply.status(200).send(user);
                 } catch (error) {
-                    reply.redirect(`${_frontendBaseUrl.default}/login?error=google`);
+                    reply.status(400).redirect(`${_frontendBaseUrl.default}/login?error=google`);
                 }
             });
             return function(request, reply) {
@@ -196,7 +131,7 @@ const googleRoute = function() {
             };
         }());
     });
-    return function googleRoute(fastify, options) {
+    return function googleRoute(fastify) {
         return _ref.apply(this, arguments);
     };
 }();

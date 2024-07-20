@@ -29,7 +29,7 @@ const app = fastify();
 app.register(fastifyHelmet);
 
 app.register(fastifyCors, {
-  origin: siteOrigin,
+  origin: siteOrigin /* ['http://localhost:5173, http://127.0.0.1:5173'] */,
   credentials: true,
   allowedHeaders: [
     'Content-Type',
@@ -40,7 +40,8 @@ app.register(fastifyCors, {
     'github_token',
     'google_token',
     'x_token'
-  ]
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 });
 
 app.register(fastifyCookie);

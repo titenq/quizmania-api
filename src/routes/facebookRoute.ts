@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pipeline } from 'node:stream';
+import { promisify } from 'node:util';
 
 import 'dotenv/config';
 import axios from 'axios';
@@ -33,6 +35,8 @@ const buildFacebookAuthUrl = () => {
   return `${facebookAuthUrl}?${params.toString()}`;
 };
 
+const asyncPipeline = promisify(pipeline);
+
 const facebookRoute = async (fastify: FastifyInstance) => {
   fastify.get('/facebook',
     {
@@ -41,7 +45,6 @@ const facebookRoute = async (fastify: FastifyInstance) => {
     async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
       try {
         const url = buildFacebookAuthUrl();
-
         reply.redirect(url);
       } catch (error) {
         return reply.redirect(`${webBaseUrl}/login?error=facebook`);
@@ -59,7 +62,6 @@ const facebookRoute = async (fastify: FastifyInstance) => {
     ): Promise<void> => {
       try {
         const code = request.query.code;
-
         if (!code) {
           return reply.redirect(`${webBaseUrl}/login?error=facebook`);
         }
@@ -74,7 +76,6 @@ const facebookRoute = async (fastify: FastifyInstance) => {
         });
 
         const token = tokenResponse.data.access_token;
-
         reply.redirect(`${webBaseUrl}/auth/facebook/callback?token=${token}`);
       } catch (error) {
         return reply.redirect(`${webBaseUrl}/login?error=facebook`);
@@ -89,49 +90,35 @@ const facebookRoute = async (fastify: FastifyInstance) => {
     async (
       request: FastifyRequest<{ Headers: IFacebookUserRequest }>,
       reply: FastifyReply
-    ): Promise<IUser | void> => {
+    ) => {
       try {
         const token = request.headers.facebook_token;
-
         if (!token) {
           return reply.redirect(`${webBaseUrl}/login?error=token`);
         }
 
         const response = await axios.get(`${facebookUserInfoUrl}?fields=id,name,email,picture.type(large)&access_token=${token}`);
-
-        const id = response.data.id;
-        const name = response.data.name;
-        const email = response.data.email;
-        const photo = response.data.picture.data.url;
+        const { id, name, email, picture } = response.data;
+        const photoUrl = `${apiBaseUrl}/uploads/facebook/${id}.jpg`;
+        const photoPath = path.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
 
         const photoResponse = await axios({
-          url: photo,
+          url: picture.data.url,
           method: 'GET',
           responseType: 'stream'
         });
 
-        const photoPath = path.join(dirname, '..', '..', '..', 'uploads', 'facebook', `${id}.jpg`);
-        const writer = fs.createWriteStream(photoPath);
+        await asyncPipeline(photoResponse.data, fs.createWriteStream(photoPath));
 
-        photoResponse.data.pipe(writer);
+        const user: IUser = {
+          name,
+          email,
+          picture: photoUrl
+        };
 
-        writer.on('finish', async () => {
-          const photoUrl = `${apiBaseUrl}/uploads/facebook/${id}.jpg`;
+        await createUserIfNotExists(user);
 
-          const user: IUser = {
-            name,
-            email,
-            picture: photoUrl
-          };
-
-          await createUserIfNotExists(user);
-
-          reply.status(200).send(user);
-        });
-
-        writer.on('error', error => {
-          reply.redirect(`${webBaseUrl}/login?error=facebook`);
-        });
+        return reply.status(200).send(user);
       } catch (error) {
         return reply.redirect(`${webBaseUrl}/login?error=facebook`);
       }

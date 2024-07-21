@@ -93,6 +93,7 @@ const facebookRoute = async (fastify: FastifyInstance) => {
     ) => {
       try {
         const token = request.headers.facebook_token;
+        
         if (!token) {
           return reply.redirect(`${webBaseUrl}/login?error=token`);
         }

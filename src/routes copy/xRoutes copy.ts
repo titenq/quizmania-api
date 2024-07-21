@@ -68,8 +68,6 @@ router.post('/user', async (req: Request, res: Response): Promise<IUser | void> 
 
     const userInfo = response.data;
 
-    console.log(userInfo);
-
     const user: IUser = {
       name: userInfo.data.name,
       email: userInfo.data.id,

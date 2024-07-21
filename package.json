@@ -29,8 +29,6 @@
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.6.13",
-    "@types/axios": "^0.14.0",
-    "@types/dotenv": "^8.2.0",
     "@types/node": "^20.14.10",
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",

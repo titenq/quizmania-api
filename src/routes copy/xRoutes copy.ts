@@ -1,13 +1,10 @@
 import 'dotenv/config';
-import express, { Request, Response } from 'express';
 import axios from 'axios';
 
 import apiBaseUrl from '../helpers/apiBaseUrl';
 import webBaseUrl from '../helpers/webBaseUrl';
 import { IUser } from '../interfaces/userInterface';
 import createUserIfNotExists from '../helpers/createUserIfNotExists';
-
-const router = express.Router();
 
 const xApiKey = process.env.X_API_KEY;
 const xApiKeySecret = process.env.X_API_KEY_SECRET;

@@ -1,3 +1,3 @@
 export interface IGenericError {
-  error: string
+  error: string;
 }

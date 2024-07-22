@@ -1,7 +1,7 @@
 export interface IGithubCallbackRequest {
-  code: string
+  code: string;
 }
 
 export interface IGithubUserRequest {
-  github_token: string
+  github_token: string;
 }

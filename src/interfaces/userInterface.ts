@@ -1,16 +1,19 @@
+import { Types } from 'mongoose';
+
 export interface IUser {
-  name: string,
-  email: string,
-  picture?: string | null
+  name: string;
+  email: string;
+  picture?: string | null;
 }
 
 export interface IUserHeaders {
-  api_key: string
+  api_key: string;
 }
 
 export interface IUserResponse {
-  name: string,
-  email: string,
-  picture?: string | null,
-  createdAt: Date
+  _id: Types.ObjectId,
+  name: string;
+  email: string;
+  picture?: string | null;
+  createdAt: Date;
 }

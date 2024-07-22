@@ -1,7 +1,7 @@
 export interface IFacebookCallbackRequest {
-  code: string
+  code: string;
 }
 
 export interface IFacebookUserRequest {
-  facebook_token: string
+  facebook_token: string;
 }

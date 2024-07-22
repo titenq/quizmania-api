@@ -1,7 +1,7 @@
 export interface IGoogleCallbackRequest {
-  code: string
+  code: string;
 }
 
 export interface IGoogleUserRequest {
-  google_token: string
+  google_token: string;
 }

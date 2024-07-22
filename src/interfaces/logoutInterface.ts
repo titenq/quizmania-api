@@ -1,3 +1,3 @@
 export interface ILogoutResponse {
-  message: string
+  message: string;
 }

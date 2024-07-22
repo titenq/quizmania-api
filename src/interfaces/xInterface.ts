@@ -1,7 +1,7 @@
 export interface IXCallbackRequest {
-  code: string
+  code: string;
 }
 
 export interface IXUserRequest {
-  x_token: string
+  x_token: string;
 }

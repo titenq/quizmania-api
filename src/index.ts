@@ -29,7 +29,7 @@ const app = fastify();
 app.register(fastifyHelmet);
 
 app.register(fastifyCors, {
-  origin: siteOrigin /* ['http://localhost:5173, http://127.0.0.1:5173'] */,
+  origin: siteOrigin,
   credentials: true,
   allowedHeaders: [
     'Content-Type',

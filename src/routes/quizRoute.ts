@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
@@ -7,7 +8,7 @@ import { quizCreateSchema } from '../schemas/quizSchema';
 import { IGenericError } from '../interfaces/errorInterface';
 import { IQuiz, IQuizHeaders } from '../interfaces/quizInterface';
 
-const userRoute = async (fastify: FastifyInstance) => {
+const quizRoute = async (fastify: FastifyInstance) => {
   fastify.withTypeProvider<ZodTypeProvider>()
     .post('/quizzes',
       {
@@ -21,9 +22,16 @@ const userRoute = async (fastify: FastifyInstance) => {
           const { userId, quizTitle, questions } = request.body;
           const { api_key } = request.headers;
 
-          const { apiKey } = process.env;
+          const { API_KEY } = process.env;
 
-          if (api_key !== apiKey) {
+          console.log('quizzes')
+          console.log({ userId });
+          console.log({ quizTitle });
+          console.log({ questions });
+          console.log({ api_key });
+          console.log({ API_KEY });
+
+          if (api_key !== API_KEY) {
             const error: IGenericError = { error: 'api_key inválida' };
 
             reply.status(401).send(error);
@@ -39,6 +47,7 @@ const userRoute = async (fastify: FastifyInstance) => {
 
           return reply.status(200).send(quiz);
         } catch (error) {
+          console.log(error)
           errorHandler(error, request, reply);
         }
       }
@@ -70,4 +79,4 @@ const userRoute = async (fastify: FastifyInstance) => {
     ); */
 };
 
-export default userRoute;
+export default quizRoute;

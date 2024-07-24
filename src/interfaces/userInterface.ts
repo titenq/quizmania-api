@@ -11,7 +11,7 @@ export interface IUserHeaders {
 }
 
 export interface IUserResponse {
-  _id: Types.ObjectId,
+  _id: Types.ObjectId;
   name: string;
   email: string;
   picture?: string | null;

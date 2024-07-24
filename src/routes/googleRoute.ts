@@ -91,9 +91,9 @@ const googleRoute = async (fastify: FastifyInstance) => {
           picture: userInfo.picture
         };
 
-        await createUserIfNotExists(user);
+        const userExists = await createUserIfNotExists(user);
 
-        reply.status(200).send(user);
+        reply.status(200).send(userExists);
       } catch (error) {
         return reply.redirect(`${webBaseUrl}/login?error=google`);
       }

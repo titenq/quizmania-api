@@ -1,10 +1,10 @@
 import UserModel from '../models/UserModel';
-import { IUser } from '../interfaces/userInterface';
+import { IUser, IUserResponse } from '../interfaces/userInterface';
 
 const userService = {
   createUser: async (user: IUser) => {
     try {
-      const userCreated: IUser = await UserModel.create(user);
+      const userCreated: IUserResponse = await UserModel.create(user);
 
       return userCreated;
     } catch (error) {
@@ -14,7 +14,7 @@ const userService = {
 
   getUserByEmail: async (email: string) => {
     try {
-      const user = await UserModel.findOne({ email });
+      const user: IUserResponse | null = await UserModel.findOne({ email });
 
       return user;
     } catch (error) {

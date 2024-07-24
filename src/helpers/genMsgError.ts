@@ -9,6 +9,7 @@ export enum Type {
   NONNEGATIVE = 'não pode ser um número negativo',
   MIN = 'deve ter o número mínimo de caracteres igual a',
   MAX = 'deve ter o número máximo de caracteres igual a',
+  LENGTH = 'deve ter o número de elementos igual a',
   EMAIL = 'com formato inválido',
   URL = 'com formato inválido'
 }

@@ -1,25 +1,22 @@
-import axios from 'axios';
+import { IUser, IUserResponse } from '../interfaces/userInterface';
+import { IGenericError } from '../interfaces/errorInterface';
+import userService from '../services/userService';
 
-import { IUser } from '../interfaces/userInterface';
-import apiBaseUrl from './apiBaseUrl';
-
-const createUserIfNotExists = async (user: IUser): Promise<void> => {
+const createUserIfNotExists = async (user: IUser): Promise<IUserResponse | IGenericError> => {
   try {
-    const userExists = await axios.get(`${apiBaseUrl}/users/${user.email}`, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const userExists = await userService.getUserByEmail(user?.email);
 
-    if (!userExists.data) {
-      await axios.post<IUser>(`${apiBaseUrl}/user`, user, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+    if (!userExists) {
+      const createUser: IUserResponse | IGenericError = await userService.createUser(user);
+
+      return createUser;
     }
+
+    return userExists;
   } catch (error) {
-    throw error;
+    const errorMessage: IGenericError = { error: 'Erro ao criar usuário' };
+
+    return errorMessage;
   }
 };
 

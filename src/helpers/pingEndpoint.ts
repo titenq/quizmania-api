@@ -9,8 +9,8 @@ const pingEndpoint = () => {
       const response: AxiosResponse<IPingResponse> = await axios.get(`${apiBaseUrl}/ping`);
 
       console.log('Ping response:', response.data);
-    } catch (err) {
-      console.error('Erro ao fazer ping:', err);
+    } catch (error) {
+      console.error('Erro ao fazer ping:', error);
     }
   }, 840000); // 14 minutos
 };

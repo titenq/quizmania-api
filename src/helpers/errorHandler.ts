@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 
 const errorHandler = (error: any, request: FastifyRequest, reply: FastifyReply) => {
-  if (error instanceof ZodError || error.details.issues) {
+  if (error instanceof ZodError || error?.details?.issues) {
     reply.status(400).send({
       statusCode: 400,
       error: 'Bad Request',
@@ -12,7 +12,9 @@ const errorHandler = (error: any, request: FastifyRequest, reply: FastifyReply) 
     return;
   }
 
-  reply.send(error);
+  const statusCode = error?.statusCode || 500;
+
+  reply.status(statusCode).send(error);
 };
 
 export default errorHandler;

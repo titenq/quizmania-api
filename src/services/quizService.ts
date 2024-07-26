@@ -10,17 +10,7 @@ const quizService = {
     } catch (error) {
       return { error: 'Erro ao criar quiz' };
     }
-  },
-
-  /* getUserByEmail: async (email: string) => {
-    try {
-      const user: IUserResponse | null = await UserModel.findOne({ email });
-
-      return user;
-    } catch (error) {
-      return { error: 'Erro ao buscar usuário por e-mail' };
-    }
-  }, */
+  }
 };
 
 export default quizService;

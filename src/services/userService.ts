@@ -1,5 +1,6 @@
 import UserModel from '../models/UserModel';
 import { IUser, IUserResponse } from '../interfaces/userInterface';
+import { IGenericError } from '../interfaces/errorInterface';
 
 const userService = {
   createUser: async (user: IUser) => {
@@ -8,7 +9,12 @@ const userService = {
 
       return userCreated;
     } catch (error) {
-      return { error: 'Erro ao criar usuário' };
+      const errorMessage: IGenericError = {
+        message: 'Erro ao criar usuário',
+        statusCode: 400
+      }
+
+      return errorMessage;
     }
   },
 
@@ -18,7 +24,12 @@ const userService = {
 
       return user;
     } catch (error) {
-      return { error: 'Erro ao buscar usuário por e-mail' };
+      const errorMessage: IGenericError = {
+        message: 'Erro ao buscar usuário por e-mail',
+        statusCode: 404
+      }
+
+      return errorMessage;
     }
   },
 };

@@ -1,3 +1,4 @@
 export interface IGenericError {
-  error: string;
+  message: string;
+  statusCode: number;
 }

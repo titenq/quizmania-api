@@ -21,22 +21,26 @@ const userRoute = async (fastify: FastifyInstance) => {
           const { name, email, picture } = request.body;
           const { api_key } = request.headers;
 
-          const { apiKey } = process.env;
+          const { API_KEY } = process.env;
 
-          if (api_key !== apiKey) {
-            const error: IGenericError = { error: 'api_key inválida' };
+          if (api_key !== API_KEY) {
+            const errorMessage: IGenericError = {
+              message: 'api_key inválida',
+              statusCode: 401
+            };
 
-            reply.status(401).send(error);
-
-            return;
+            return errorHandler(errorMessage, request, reply);
           }
 
           const userExists = await userService.getUserByEmail(email);
 
           if (userExists) {
-            const error: IGenericError = { error: 'E-mail já cadastrado' };
+            const errorMessage: IGenericError = {
+              message: 'E-mail já cadastrado',
+              statusCode: 409
+            };
 
-            return reply.status(409).send(error);
+            return errorHandler(errorMessage, request, reply);
           }
 
           const user = await userService.createUser({
@@ -65,14 +69,22 @@ const userRoute = async (fastify: FastifyInstance) => {
           const user = await userService.getUserByEmail(email);
 
           if (!user) {
-            return reply.status(404).send({
-              error: 'Erro ao buscar usuário por e-mail'
-            });
+            const errorMessage: IGenericError = {
+              message: 'Erro ao buscar usuário por e-mail',
+              statusCode: 404
+            };
+
+            return errorHandler(errorMessage, request, reply);
           }
 
           return reply.status(200).send(user);
         } catch (error) {
-          errorHandler(error, request, reply);
+          const errorMessage: IGenericError = {
+            message: 'Erro ao buscar usuário por e-mail',
+            statusCode: 500
+          };
+
+          errorHandler(errorMessage, request, reply);
         }
       }
     );

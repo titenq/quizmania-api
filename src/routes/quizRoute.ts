@@ -21,22 +21,15 @@ const quizRoute = async (fastify: FastifyInstance) => {
         try {
           const { userId, quizTitle, questions } = request.body;
           const { api_key } = request.headers;
-
           const { API_KEY } = process.env;
 
-          console.log('quizzes')
-          console.log({ userId });
-          console.log({ quizTitle });
-          console.log({ questions });
-          console.log({ api_key });
-          console.log({ API_KEY });
-
           if (api_key !== API_KEY) {
-            const error: IGenericError = { error: 'api_key inválida' };
-
-            reply.status(401).send(error);
-
-            return;
+            const error: IGenericError = {
+              message: 'api_key inválida',
+              statusCode: 401
+            };
+            
+            return errorHandler(error, request, reply);
           }
 
           const quiz = await quizService.createQuiz({
@@ -47,8 +40,7 @@ const quizRoute = async (fastify: FastifyInstance) => {
 
           return reply.status(200).send(quiz);
         } catch (error) {
-          console.log(error)
-          errorHandler(error, request, reply);
+          return errorHandler(error, request, reply);
         }
       }
     );

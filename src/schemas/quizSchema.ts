@@ -11,25 +11,26 @@ const quizCreateSchema = {
     quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
       .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
       .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
-    questions: z.object({
-      question: z.string(genMsgError('question', Type.STRING, Required.TRUE))
-        .min(5, genMsgError('question', Type.MIN, Required.NULL, '5'))
-        .max(256, genMsgError('question', Type.MAX, Required.NULL, '256')),
-      rightAnswer: z.string(genMsgError('rightAnswer', Type.STRING, Required.TRUE))
-        .min(1, genMsgError('rightAnswer', Type.MIN, Required.NULL, '1'))
-        .max(256, genMsgError('rightAnswer', Type.MAX, Required.NULL, '256')),
-      wrongAnswers: z.array(
-        z.string(genMsgError('wrongAnswers', Type.STRING, Required.TRUE))
-          .min(1, genMsgError('wrongAnswers', Type.MIN, Required.NULL, '1'))
-          .max(256, genMsgError('wrongAnswers', Type.MAX, Required.NULL, '256')))
-          .length(4, genMsgError('wrongAnswers', Type.LENGTH, Required.NULL, '4')
-      )
-    })
+    questions: z.array(
+      z.object({
+        question: z.string(genMsgError('question', Type.STRING, Required.TRUE))
+          .min(5, genMsgError('question', Type.MIN, Required.NULL, '5'))
+          .max(256, genMsgError('question', Type.MAX, Required.NULL, '256')),
+        rightAnswer: z.string(genMsgError('rightAnswer', Type.STRING, Required.TRUE))
+          .min(1, genMsgError('rightAnswer', Type.MIN, Required.NULL, '1'))
+          .max(256, genMsgError('rightAnswer', Type.MAX, Required.NULL, '256')),
+        wrongAnswers: z.array(
+          z.string(genMsgError('wrongAnswers', Type.STRING, Required.TRUE))
+            .min(1, genMsgError('wrongAnswers', Type.MIN, Required.NULL, '1'))
+            .max(256, genMsgError('wrongAnswers', Type.MAX, Required.NULL, '256'))
+        ).length(4, genMsgError('wrongAnswers', Type.LENGTH, Required.NULL, '4'))
+      })
+    ).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1'))
   })
     .describe(`
 <b>&#42;userId:</b> string
 <b>&#42;quizTitle:</b> string (min: 5, max: 64)
-<b>&#42;questions:</b> {
+<b>&#42;questions:</b> [{
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;question:</b> string (min: 5, max: 256)
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;rightAnswer:</b> string (min: 1, max: 256)
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;wrongAnswers:</b> [
@@ -38,7 +39,7 @@ const quizCreateSchema = {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string (min: 1, max: 256),
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string (min: 1, max: 256)
 &nbsp;&nbsp;&nbsp;&nbsp;]
-}`
+}]`
     ),
   headers: z.object({
     api_key: z.string(genMsgError('api_key', Type.STRING, Required.TRUE))
@@ -49,20 +50,22 @@ const quizCreateSchema = {
       _id: z.string(genMsgError('_id', Type.STRING, Required.TRUE)),
       userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE)),
       quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE)),
-      questions: z.object({
-        question: z.string(genMsgError('question', Type.STRING, Required.TRUE)),
-        rightAnswer: z.string(genMsgError('rightAnswer', Type.STRING, Required.TRUE)),
-        wrongAnswers: z.string(genMsgError('wrongAnswers', Type.STRING, Required.TRUE))
-          .array()
-          .length(4, genMsgError('wrongAnswers', Type.LENGTH, Required.NULL, '4'))
-      }),
+      questions: z.array(
+        z.object({
+          question: z.string(genMsgError('question', Type.STRING, Required.TRUE)),
+          rightAnswer: z.string(genMsgError('rightAnswer', Type.STRING, Required.TRUE)),
+          wrongAnswers: z.array(
+            z.string(genMsgError('wrongAnswers', Type.STRING, Required.TRUE))
+          ).length(4, genMsgError('wrongAnswers', Type.LENGTH, Required.NULL, '4'))
+        })
+      ).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1')),
       createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
     })
       .describe(`
 <b>&#42;_id:</b> string
 <b>&#42;userId:</b> string
 <b>&#42;quizTitle:</b> string
-<b>&#42;questions:</b> {
+<b>&#42;questions:</b> [{
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;question:</b> string
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;rightAnswer:</b> string
 &nbsp;&nbsp;&nbsp;&nbsp;<b>&#42;wrongAnswers:</b> [
@@ -71,13 +74,16 @@ const quizCreateSchema = {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string
 &nbsp;&nbsp;&nbsp;&nbsp;]
-}
+}]
 <b>&#42;createdAt:</b> Date`
       ),
     401: z.object({
-      error: z.string(genMsgError('error', Type.STRING, Required.TRUE))
-    })
-      .describe('<b>&#42;error:</b> string')
+      message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
+      statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
+    }).describe(`
+<b>&#42;message:</b> string
+<b>&#42;statusCode:</b> number`
+    )
   }
 };
 

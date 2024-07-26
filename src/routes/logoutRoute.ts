@@ -2,6 +2,8 @@ import { promisify } from 'node:util';
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { ILogoutResponse } from '../interfaces/logoutInterface';
+import { IGenericError } from '../interfaces/errorInterface';
+import errorHandler from '../helpers/errorHandler';
 
 const { NAME_SESSION } = process.env;
 
@@ -26,9 +28,12 @@ const logoutRoute = async (fastify: FastifyInstance) => {
 
         reply.status(200).send(messageSuccess);
       } catch (error) {
-        const messageError: ILogoutResponse = { message: 'Erro ao fazer logout' };
+        const messageError: IGenericError = {
+          message: 'Erro ao fazer logout',
+          statusCode: 400
+        };
 
-        reply.status(400).send(messageError);
+        return errorHandler(messageError, request, reply);
       }
     }
   );

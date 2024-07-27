@@ -1,16 +1,11 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { IPingResponse } from '../interfaces/pingInterface';
+import { FastifyInstance } from 'fastify';
+
+import { pingController } from '../controllers/pingController';
 
 const pingRoute = async (fastify: FastifyInstance) => {
   fastify.get('/ping',
-    {
-      schema: { hide: true }
-    },
-    (request: FastifyRequest, reply: FastifyReply): FastifyReply => {
-      const response: IPingResponse = { ping: 'pong' };
-
-      return reply.status(200).send(response);
-    }
+    { schema: { hide: true } },
+    pingController
   );
 };
 

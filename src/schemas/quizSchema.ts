@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { z } from 'zod';
 
 import { genMsgError, Required, Type } from '../helpers/genMsgError';
@@ -27,7 +28,7 @@ const quizSchema = z.object({
 });
 
 const quizResponseSchema = z.object({
-  _id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Formato inválido do ObjectId'),
+  _id: z.instanceof(mongoose.Types.ObjectId, genMsgError('_id', Type.STRING, Required.NULL)),
   userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE)),
   quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
     .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))

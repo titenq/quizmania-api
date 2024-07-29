@@ -27,7 +27,7 @@ const quizService = {
     try {
       const { userId, page } = query;
 
-      const quizzes = await QuizModel
+      const quizzes: IQuizResponse[] = await QuizModel
         .find({ userId })
         .limit(20)
         .skip((Number(page) - 1) * 20)

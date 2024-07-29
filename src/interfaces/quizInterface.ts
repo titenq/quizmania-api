@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 export interface IQuestion {
   question: string;
@@ -12,16 +12,13 @@ export interface IQuiz {
   questions: IQuestion[];
 }
 
-export interface IQuizHeaders {
-  api_key: string;
+export interface IQuizResponse extends IQuiz {
+  _id: mongoose.Types.ObjectId;
+  createdAt: Date;
 }
 
-export interface IQuizResponse {
-  _id: Types.ObjectId;
-  userId: string;
-  quizTitle: string;
-  questions: IQuestion[];
-  createdAt: Date;
+export interface IQuizHeaders {
+  api_key: string;
 }
 
 export interface IQuizGetAll {
@@ -30,7 +27,7 @@ export interface IQuizGetAll {
 }
 
 export interface IQuizGetAllResponse {
-  quizzes: IQuiz[];
+  quizzes: IQuizResponse[];
   totalPages: number;
   currentPage: number;
 }

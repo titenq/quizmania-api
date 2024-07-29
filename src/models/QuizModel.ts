@@ -1,3 +1,4 @@
+import { string } from 'zod';
 import mongoose from '../db';
 
 const QuestionSchema = new mongoose.Schema({

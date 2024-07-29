@@ -23,3 +23,22 @@ export interface IQuizResponse {
   questions: IQuestion[];
   createdAt: Date;
 }
+
+export interface IQuizGetAll {
+  userId: string;
+  page: string;
+}
+
+export interface IQuizGetAllResponse {
+  quizzes: IQuiz[];
+  totalPages: number;
+  currentPage: number;
+}
+
+export interface IQuizGetAllQuery {
+  page: string;
+}
+
+export interface IQuizGetAllParams {
+  userId: string;
+}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { genMsgError, Required, Type } from '../helpers/genMsgError';
 
 const questionSchema = z.object({
@@ -25,6 +26,39 @@ const quizSchema = z.object({
   questions: z.array(questionSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1'))
 });
 
+const quizResponseSchema = z.object({
+  _id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Formato inválido do ObjectId'),
+  userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE)),
+  quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
+    .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
+    .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
+  questions: z.array(questionSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1')),
+  createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
+});
+
+const quizGetAllResponseSchema = z.object({
+  quizzes: z.array(quizResponseSchema),
+  totalPages: z.number(genMsgError('totalPages', Type.NUMBER, Required.TRUE))
+    .int(genMsgError('totalPages', Type.INT, Required.NULL))
+    .positive(genMsgError('totalPages', Type.POSITIVE, Required.NULL)),
+  currentPage: z.number(genMsgError('currentPage', Type.NUMBER, Required.TRUE))
+    .int(genMsgError('currentPage', Type.INT, Required.NULL))
+    .positive(genMsgError('currentPage', Type.POSITIVE, Required.NULL))
+});
+
+const apiKeySchema = z.object({
+  api_key: z.string(genMsgError('api_key', Type.STRING, Required.TRUE))
+    .describe('<pre><code><b>*api_key:</b> string</code></pre>')
+});
+
+const errorSchema = z.object({
+  message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
+  statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
+})
+  .describe(`<pre><code><b>*message:</b> string
+<b>*statusCode:</b> number
+</code></pre>`);
+
 const quizCreateSchema = {
   summary: 'Criar quiz',
   tags: ['Quizzes'],
@@ -42,16 +76,9 @@ const quizCreateSchema = {
   ]
 ]
 </code></pre>`),
-  headers: z.object({
-    api_key: z.string(genMsgError('api_key', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*api_key:</b> string</code></pre>')
-  }),
+  headers: apiKeySchema,
   response: {
-    201: z.object({
-      _id: z.string(genMsgError('_id', Type.STRING, Required.TRUE)),
-      quizSchema,
-      createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
-    })
+    201: quizResponseSchema
       .describe(`<pre><code><b>*_id:</b> string
 <b>*userId:</b> string
 <b>*quizTitle:</b> string
@@ -67,37 +94,25 @@ const quizCreateSchema = {
 }]
 <b>*createdAt:</b> Date
 </code></pre>`),
-    400: z.object({
-      message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
-      statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
-    })
-      .describe(`<pre><code><b>*message:</b> string
-<b>*statusCode:</b> number
-</code></pre>`)
+    400: errorSchema,
+    401: errorSchema
   }
 };
 
 const quizGetAllSchema = {
-  summary: 'Buscar todos os quizzes',
+  summary: 'Buscar todos os quizzes de um usuário',
   tags: ['Quizzes'],
+  querystring: z.object({
+    page: z.string(genMsgError('page', Type.STRING, Required.TRUE))
+      .describe('<pre><code><b>*page:</b> string</code></pre>')
+  }),
   params: z.object({
     userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*userId:</b> string</code></pre>'),
-    page: z.number(genMsgError('page', Type.NUMBER, Required.TRUE))
-      .int(genMsgError('page', Type.INT, Required.NULL))
-      .positive(genMsgError('page', Type.POSITIVE, Required.NULL))
-      .describe('<pre><code><b>*page:</b> number</code></pre>')
+      .describe('<pre><code><b>*userId:</b> string</code></pre>')
   }),
+  headers: apiKeySchema,
   response: {
-    200: z.object({
-      quizzes: z.array(quizSchema),
-      totalPages: z.number(genMsgError('totalPages', Type.NUMBER, Required.TRUE))
-        .int(genMsgError('totalPages', Type.INT, Required.NULL))
-        .positive(genMsgError('totalPages', Type.POSITIVE, Required.NULL)),
-      currentPage: z.number(genMsgError('currentPage', Type.NUMBER, Required.TRUE))
-        .int(genMsgError('currentPage', Type.INT, Required.NULL))
-        .positive(genMsgError('currentPage', Type.POSITIVE, Required.NULL))
-    })
+    200: quizGetAllResponseSchema
       .describe(`<pre><code><b>*quizzes:</b> [
   <b>*_id:</b> string
   <b>*userId:</b> string
@@ -117,13 +132,8 @@ const quizGetAllSchema = {
 <b>*totalPages:</b> number
 <b>*currentPage:</b> number
 </code></pre>`),
-    400: z.object({
-      message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
-      statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
-    })
-      .describe(`<pre><code><b>*message:</b> string
-<b>*statusCode:</b> number
-</code></pre>`)
+    400: errorSchema,
+    401: errorSchema
   }
 };
 

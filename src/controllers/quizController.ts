@@ -22,6 +22,7 @@ const createQuizController = async (
 
     if (api_key !== API_KEY) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'api_key inválida',
         statusCode: 401
       };
@@ -53,6 +54,7 @@ const getAllQuizController = async (
 
     if (api_key !== API_KEY) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'api_key inválida',
         statusCode: 401
       };
@@ -79,6 +81,7 @@ const getQuizController = async (
 
     if (api_key !== API_KEY) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'api_key inválida',
         statusCode: 401
       };

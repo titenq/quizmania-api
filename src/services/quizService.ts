@@ -16,6 +16,7 @@ const quizService = {
       return quizCreated;
     } catch (error) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao criar quiz',
         statusCode: 400
       };
@@ -45,6 +46,7 @@ const quizService = {
       return quizzesPaged;
     } catch (error) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao criar quiz',
         statusCode: 400
       };
@@ -61,6 +63,7 @@ const quizService = {
 
       if (!quiz) {
         const errorMessage: IGenericError = {
+          error: true,
           message: 'Não existe quiz com esse ID',
           statusCode: 404
         };
@@ -71,6 +74,7 @@ const quizService = {
       return quiz;
     } catch (error) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao buscar quiz',
         statusCode: 400
       };

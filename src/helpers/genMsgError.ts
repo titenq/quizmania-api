@@ -20,7 +20,7 @@ export enum Required {
   NULL
 }
 
-interface ErrorMessage {
+interface errorMessage {
   required_error?: string;
   invalid_type_error?: string;
   message?: string;
@@ -51,7 +51,7 @@ const getMessage = (field: string, type: Type, value?: string) => {
   };
 };
 
-export const genMsgError = (field: string, type: Type, required: Required, value?: string): ErrorMessage => {
+export const genMsgError = (field: string, type: Type, required: Required, value?: string): errorMessage => {
   if (required === Required.TRUE) {
     return getRequiredError(field, type);
   }

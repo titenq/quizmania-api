@@ -3,7 +3,13 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import errorHandler from '../helpers/errorHandler';
 import quizService from '../services/quizService';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IQuiz, IQuizGetAll, IQuizGetAllParams, IQuizGetAllQuery, IQuizHeaders } from '../interfaces/quizInterface';
+import {
+  IQuiz,
+  IQuizGetAllParams,
+  IQuizGetAllQuery,
+  IQuizGetParams,
+  IQuizHeaders
+} from '../interfaces/quizInterface';
 
 const createQuizController = async (
   request: FastifyRequest<{ Body: IQuiz, Headers: IQuizHeaders }>,
@@ -62,7 +68,36 @@ const getAllQuizController = async (
   }
 };
 
+const getQuizController = async (
+  request: FastifyRequest<{ Params: IQuizGetParams, Headers: IQuizHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { quizId } = request.params;
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const quiz = await quizService.getQuiz({ quizId });
+
+    console.log(quiz);
+
+    reply.status(200).send(quiz);
+  } catch (error) {
+    errorHandler(error, request, reply);
+  }
+};
+
 export {
   createQuizController,
-  getAllQuizController
+  getAllQuizController,
+  getQuizController
 };

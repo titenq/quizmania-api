@@ -24,11 +24,11 @@ export const logoutController = async (request: FastifyRequest, reply: FastifyRe
 
     reply.status(200).send(messageSuccess);
   } catch (error) {
-    const messageError: IGenericError = {
+    const errorMessage: IGenericError = {
       message: 'Erro ao fazer logout',
       statusCode: 400
     };
 
-    errorHandler(messageError, request, reply);
+    errorHandler(errorMessage, request, reply);
   }
 };

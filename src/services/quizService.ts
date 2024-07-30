@@ -2,6 +2,7 @@ import QuizModel from '../models/QuizModel';
 import { IGenericError } from '../interfaces/errorInterface';
 import {
   IQuiz,
+  IQuizGet,
   IQuizGetAll,
   IQuizGetAllResponse,
   IQuizResponse
@@ -14,12 +15,12 @@ const quizService = {
 
       return quizCreated;
     } catch (error) {
-      const messageError: IGenericError = {
+      const errorMessage: IGenericError = {
         message: 'Erro ao criar quiz',
         statusCode: 400
       };
 
-      return messageError;
+      return errorMessage;
     }
   },
 
@@ -43,12 +44,38 @@ const quizService = {
 
       return quizzesPaged;
     } catch (error) {
-      const messageError: IGenericError = {
+      const errorMessage: IGenericError = {
         message: 'Erro ao criar quiz',
         statusCode: 400
       };
 
-      return messageError;
+      return errorMessage;
+    }
+  },
+
+  getQuiz: async (query: IQuizGet) => {
+    try {
+      const { quizId } = query;
+
+      const quiz: IQuizResponse[] = await QuizModel.find({ _id: quizId });
+
+      if (!quiz) {
+        const errorMessage: IGenericError = {
+          message: 'Não existe quiz com esse ID',
+          statusCode: 404
+        };
+
+        return errorMessage;
+      }
+
+      return quiz;
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        message: 'Erro ao buscar quiz',
+        statusCode: 400
+      };
+
+      return errorMessage;
     }
   }
 };

@@ -26,6 +26,10 @@ export interface IQuizGetAll {
   page: string;
 }
 
+export interface IQuizGet {
+  quizId: string;
+}
+
 export interface IQuizGetAllResponse {
   quizzes: IQuizResponse[];
   totalPages: number;
@@ -38,4 +42,8 @@ export interface IQuizGetAllQuery {
 
 export interface IQuizGetAllParams {
   userId: string;
+}
+
+export interface IQuizGetParams {
+  quizId: string;
 }

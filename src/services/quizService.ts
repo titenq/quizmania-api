@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 import QuizModel from '../models/QuizModel';
 import { IGenericError } from '../interfaces/errorInterface';
 import {
@@ -55,13 +57,23 @@ const quizService = {
     }
   },
 
-  getQuiz: async (query: IQuizGet) => {
+  getQuiz: async (query: IQuizGet): Promise<IQuizResponse | IGenericError> => {
     try {
       const { quizId } = query;
 
-      const quiz: IQuizResponse[] = await QuizModel.find({ _id: quizId });
+      if (!mongoose.isValidObjectId(quizId)) {
+        const errorMessage: IGenericError = {
+          error: true,
+          message: 'Quiz ID com formato inválido',
+          statusCode: 404
+        };
 
-      if (!quiz) {
+        return errorMessage;
+      }
+
+      const response: IQuizResponse | null = await QuizModel.findById({ _id: quizId });
+
+      if (!response) {
         const errorMessage: IGenericError = {
           error: true,
           message: 'Não existe quiz com esse ID',
@@ -71,7 +83,7 @@ const quizService = {
         return errorMessage;
       }
 
-      return quiz;
+      return response;
     } catch (error) {
       const errorMessage: IGenericError = {
         error: true,

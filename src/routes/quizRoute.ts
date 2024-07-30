@@ -22,7 +22,7 @@ const quizRoute = async (fastify: FastifyInstance) => {
     );
   
   fastify.withTypeProvider<ZodTypeProvider>()
-    .get('/quiz/:quizId',
+    .get('/quizzes/questions/:quizId',
     //{ schema: quizGetSchema },
       { schema: { hide: true }},
       getQuizController

@@ -8,7 +8,8 @@ import {
   IQuizGetAllParams,
   IQuizGetAllQuery,
   IQuizGetParams,
-  IQuizHeaders
+  IQuizHeaders,
+  IQuizResponse
 } from '../interfaces/quizInterface';
 
 const createQuizController = async (
@@ -89,13 +90,21 @@ const getQuizController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const quiz = await quizService.getQuiz({ quizId });
+    const response: IQuizResponse | IGenericError = await quizService.getQuiz({ quizId });
 
-    console.log(quiz);
+    if ((response as IGenericError).error) {
+      return errorHandler(response, request, reply)
+    }
 
-    reply.status(200).send(quiz);
+    reply.status(200).send(response);
   } catch (error) {
-    errorHandler(error, request, reply);
+    const errorMessage: IGenericError = {
+      error: true,
+      message: 'erro ao buscar quiz',
+      statusCode: 400
+    };
+
+    errorHandler(errorMessage, request, reply);
   }
 };
 

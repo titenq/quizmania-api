@@ -126,7 +126,24 @@ const quizGetAllSchema = {
   }
 };
 
+const quizGetSchema = {
+  summary: 'Buscar quiz por id',
+  tags: ['Quizzes'],
+  params: z.object({
+    quizId: z.string(genMsgError('quizId', Type.STRING, Required.TRUE))
+      .describe('<pre><code><b>*quizId:</b> string</code></pre>')
+  }),
+  headers: apiKeySchema,
+  response: {
+    200: quizResponseSchema,
+    400: errorSchema,
+    401: errorSchema,
+    404: errorSchema
+  }
+};
+
 export {
   quizCreateSchema,
-  quizGetAllSchema
+  quizGetAllSchema,
+  quizGetSchema
 };

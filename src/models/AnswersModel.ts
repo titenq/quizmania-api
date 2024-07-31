@@ -1,6 +1,6 @@
 import mongoose from '../db';
 
-const AnswersSchema = new mongoose.Schema({
+const AnswerSchema = new mongoose.Schema({
   question: {
     type: String,
     required: true
@@ -15,12 +15,12 @@ const AnswersSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
-const QuizSchema = new mongoose.Schema({
+const AnswersSchema = new mongoose.Schema({
   quizId: {
     type: String,
     required: true
   },
-  answers: [AnswersSchema],
+  answers: [AnswerSchema],
   createdAt: {
     type: Date,
     default: Date.now

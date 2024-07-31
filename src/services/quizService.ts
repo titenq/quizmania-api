@@ -30,6 +30,17 @@ const quizService = {
   getAllQuiz: async (query: IQuizGetAll) => {
     try {
       const { userId, page } = query;
+      const count = await QuizModel.countDocuments({ userId });
+
+      if (count === 0) {
+        const quizzesPaged: IQuizGetAllResponse = {
+          quizzes: [],
+          totalPages: 1,
+          currentPage: 1
+        };
+
+        return quizzesPaged;
+      }
 
       const quizzes: IQuizResponse[] = await QuizModel
         .find({ userId })
@@ -37,7 +48,6 @@ const quizService = {
         .skip((Number(page) - 1) * 20)
         .sort({ createdAt: 'desc' });
 
-      const count = await QuizModel.countDocuments({ userId });
 
       const quizzesPaged: IQuizGetAllResponse = {
         quizzes,

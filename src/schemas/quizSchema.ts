@@ -18,6 +18,17 @@ const questionSchema = z.object({
   ).length(4, genMsgError('wrongAnswers', Type.LENGTH, Required.NULL, '4'))
 });
 
+const questionModifiedSchema = z.object({
+  question: z.string(genMsgError('question', Type.STRING, Required.TRUE))
+    .min(5, genMsgError('question', Type.MIN, Required.NULL, '5'))
+    .max(256, genMsgError('question', Type.MAX, Required.NULL, '256')),
+  answers: z.array(
+    z.string(genMsgError('answers', Type.STRING, Required.TRUE))
+      .min(1, genMsgError('answers', Type.MIN, Required.NULL, '1'))
+      .max(256, genMsgError('answers', Type.MAX, Required.NULL, '256'))
+  ).length(5, genMsgError('answers', Type.LENGTH, Required.NULL, '5'))
+});
+
 const quizSchema = z.object({
   userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE))
     .min(24, genMsgError('userId', Type.MIN, Required.NULL, '24'))
@@ -47,7 +58,7 @@ const quizResponseSchema = z.object({
   quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
     .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
     .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
-  questions: z.array(questionSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1')),
+  questions: z.array(questionModifiedSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1')),
   createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
 })
   .describe(`<pre><code><b>*_id:</b> string
@@ -55,8 +66,8 @@ const quizResponseSchema = z.object({
 <b>*quizTitle:</b> string
 <b>*questions:</b> [{
   <b>*question:</b> string
-  <b>*rightAnswer:</b> string
-  <b>*wrongAnswers:</b> [
+  <b>*answers:</b> [
+    string,
     string,
     string,
     string,

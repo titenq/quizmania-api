@@ -7,8 +7,10 @@ import {
   IQuizGet,
   IQuizGetAll,
   IQuizGetAllResponse,
+  IQuizModifiedResponse,
   IQuizResponse
 } from '../interfaces/quizInterface';
+import shuffleAnswers from '../helpers/shuffleAnswers';
 
 const quizService = {
   createQuiz: async (quiz: IQuiz) => {
@@ -67,7 +69,7 @@ const quizService = {
     }
   },
 
-  getQuiz: async (query: IQuizGet): Promise<IQuizResponse | IGenericError> => {
+  getQuiz: async (query: IQuizGet): Promise<IQuizModifiedResponse | IGenericError> => {
     try {
       const { quizId } = query;
 
@@ -81,9 +83,9 @@ const quizService = {
         return errorMessage;
       }
 
-      const response: IQuizResponse | null = await QuizModel.findById({ _id: quizId });
+      const quiz: IQuizResponse | null = await QuizModel.findById({ _id: quizId });
 
-      if (!response) {
+      if (!quiz) {
         const errorMessage: IGenericError = {
           error: true,
           message: 'Não existe quiz com esse ID',
@@ -93,7 +95,18 @@ const quizService = {
         return errorMessage;
       }
 
-      return response;
+      const modifiedQuiz: IQuizModifiedResponse = {
+        _id: quiz._id,
+        userId: quiz.userId.toString(),
+        quizTitle: quiz.quizTitle,
+        questions: quiz.questions.map((question) => ({
+          question: question.question,
+          answers: shuffleAnswers([question.rightAnswer, ...question.wrongAnswers]),
+        })),
+        createdAt: quiz.createdAt,
+      };
+
+      return modifiedQuiz;
     } catch (error) {
       const errorMessage: IGenericError = {
         error: true,

@@ -9,6 +9,7 @@ import {
   IQuizGetAllQuery,
   IQuizGetParams,
   IQuizHeaders,
+  IQuizModifiedResponse,
   IQuizResponse
 } from '../interfaces/quizInterface';
 
@@ -90,7 +91,7 @@ const getQuizController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const response: IQuizResponse | IGenericError = await quizService.getQuiz({ quizId });
+    const response: IQuizModifiedResponse | IGenericError = await quizService.getQuiz({ quizId });
 
     if ((response as IGenericError).error) {
       return errorHandler(response, request, reply)

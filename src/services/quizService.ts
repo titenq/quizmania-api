@@ -4,6 +4,8 @@ import QuizModel from '../models/QuizModel';
 import { IGenericError } from '../interfaces/errorInterface';
 import {
   IQuiz,
+  IQuizAdmin,
+  IQuizAdminResponse,
   IQuizGet,
   IQuizGetAll,
   IQuizGetAllResponse,
@@ -44,14 +46,13 @@ const quizService = {
         return quizzesPaged;
       }
 
-      const quizzes: IQuizResponse[] = await QuizModel
-        .find({ userId })
+      const quizzes: IQuizAdmin[] = await QuizModel
+        .find({ userId }, '_id quizTitle createdAt')
         .limit(20)
         .skip((Number(page) - 1) * 20)
         .sort({ createdAt: 'desc' });
 
-
-      const quizzesPaged: IQuizGetAllResponse = {
+      const quizzesPaged: IQuizAdminResponse = {
         quizzes,
         totalPages: Math.ceil(count / 20),
         currentPage: Number(page)

@@ -49,6 +49,18 @@ export interface IQuizGetAllResponse {
   currentPage: number;
 }
 
+export interface IQuizAdmin {
+  _id: mongoose.Types.ObjectId;
+  quizTitle: string;
+  createdAt: Date;
+}
+
+export interface IQuizAdminResponse {
+  quizzes: IQuizAdmin[];
+  totalPages: number;
+  currentPage: number;
+}
+
 export interface IQuizGetAllQuery {
   page: string;
 }

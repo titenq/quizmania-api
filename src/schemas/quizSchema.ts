@@ -36,7 +36,7 @@ const quizSchema = z.object({
   quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
     .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
     .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
-  questions: z.array(questionSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1'))
+  questions: z.array(questionModifiedSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1'))
 })
   .describe(`<pre><code><b>*userId:</b> string
 <b>*quizTitle:</b> string (min: 5, max: 64)
@@ -58,7 +58,7 @@ const quizResponseSchema = z.object({
   quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
     .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
     .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
-  questions: z.array(questionModifiedSchema).min(1, genMsgError('questions', Type.MIN, Required.NULL, '1')),
+  questions: z.array(questionSchema),
   createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
 })
   .describe(`<pre><code><b>*_id:</b> string
@@ -77,8 +77,45 @@ const quizResponseSchema = z.object({
 <b>*createdAt:</b> Date
 </code></pre>`);
 
+const quizResponseModifiedSchema = z.object({
+  _id: z.instanceof(mongoose.Types.ObjectId, genMsgError('_id', Type.STRING, Required.NULL)),
+  userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE)),
+  quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
+    .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
+    .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
+  questions: z.array(questionModifiedSchema),
+  createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
+})
+  .describe(`<pre><code><b>*_id:</b> string
+<b>*userId:</b> string
+<b>*quizTitle:</b> string
+<b>*questions:</b> [{
+  <b>*question:</b> string
+  <b>*answers:</b> [
+    string,
+    string,
+    string,
+    string,
+    string
+  ]
+}]
+<b>*createdAt:</b> Date
+</code></pre>`);
+
+const quizResponseAdminSchema = z.object({
+  _id: z.instanceof(mongoose.Types.ObjectId, genMsgError('_id', Type.STRING, Required.NULL)),
+  quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
+    .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
+    .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
+  createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
+})
+  .describe(`<pre><code><b>*_id:</b> string
+<b>*quizTitle:</b> string
+<b>*createdAt:</b> Date
+</code></pre>`);
+
 const quizGetAllResponseSchema = z.object({
-  quizzes: z.array(quizResponseSchema),
+  quizzes: z.array(quizResponseAdminSchema),
   totalPages: z.number(genMsgError('totalPages', Type.NUMBER, Required.TRUE))
     .int(genMsgError('totalPages', Type.INT, Required.NULL))
     .positive(genMsgError('totalPages', Type.POSITIVE, Required.NULL)),
@@ -146,7 +183,7 @@ const quizGetSchema = {
   }),
   headers: apiKeySchema,
   response: {
-    200: quizResponseSchema,
+    200: quizResponseModifiedSchema,
     400: errorSchema,
     401: errorSchema,
     404: errorSchema

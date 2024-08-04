@@ -72,3 +72,14 @@ export interface IQuizGetAllParams {
 export interface IQuizGetParams {
   quizId: string;
 }
+
+export interface IQuizBodyAnswer {
+  question: string;
+  answer: string;
+}
+
+export interface IQuizAnswer {
+  quizId: string;
+  question: string;
+  answer: string;
+}

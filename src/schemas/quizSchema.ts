@@ -143,6 +143,16 @@ const quizGetAllResponseSchema = z.object({
 <b>*currentPage:</b> number
 </code></pre>`);
 
+const quizResponseAnswerSchema = z.object({
+  isRight: z.boolean(genMsgError('isRight', Type.BOOLEAN, Required.TRUE)),
+  rightAnswer: z.string(genMsgError('rightAnswer', Type.STRING, Required.TRUE))
+      .min(1, genMsgError('rightAnswer', Type.MIN, Required.NULL, '1'))
+      .max(256, genMsgError('rightAnswer', Type.MAX, Required.NULL, '256'))
+})
+  .describe(`<pre><code><b>*isRight:</b> boolean
+<b>*rightAnswer:</b> string
+</code></pre>`);
+
 const quizCreateSchema = {
   summary: 'Criar quiz',
   tags: ['Quizzes'],
@@ -190,8 +200,25 @@ const quizGetSchema = {
   }
 };
 
+const quizAnswerSchema = {
+  summary: 'Verificar se a resposta enviada está correta',
+  tags: ['Quizzes'],
+  params: z.object({
+    quizId: z.string(genMsgError('quizId', Type.STRING, Required.TRUE))
+      .describe('<pre><code><b>*quizId:</b> string</code></pre>')
+  }),
+  headers: apiKeySchema,
+  response: {
+    200: quizResponseAnswerSchema,
+    400: errorSchema,
+    401: errorSchema,
+    404: errorSchema
+  }
+};
+
 export {
   quizCreateSchema,
   quizGetAllSchema,
-  quizGetSchema
+  quizGetSchema,
+  quizAnswerSchema
 };

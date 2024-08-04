@@ -5,6 +5,8 @@ import quizService from '../services/quizService';
 import { IGenericError } from '../interfaces/errorInterface';
 import {
   IQuiz,
+  IQuizAnswer,
+  IQuizBodyAnswer,
   IQuizGetAllParams,
   IQuizGetAllQuery,
   IQuizGetParams,
@@ -109,8 +111,45 @@ const getQuizController = async (
   }
 };
 
+const answerQuizController = async (
+  request: FastifyRequest<{ Params: IQuizGetParams, Body: IQuizBodyAnswer, Headers: IQuizHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { quizId } = request.params;
+    const { question, answer } = request.body;
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const response = await quizService.answerQuiz({
+      quizId,
+      question,
+      answer
+    });
+
+    if ((response as IGenericError).error) {
+      return errorHandler(response, request, reply)
+    }
+
+    reply.status(200).send(response);
+  } catch (error) {
+    errorHandler(error, request, reply);
+  }
+};
+
 export {
   createQuizController,
   getAllQuizController,
-  getQuizController
+  getQuizController,
+  answerQuizController
 };

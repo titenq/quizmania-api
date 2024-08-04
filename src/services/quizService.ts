@@ -6,6 +6,7 @@ import {
   IQuiz,
   IQuizAdmin,
   IQuizAdminResponse,
+  IQuizAnswer,
   IQuizGet,
   IQuizGetAll,
   IQuizGetAllResponse,
@@ -112,6 +113,42 @@ const quizService = {
       const errorMessage: IGenericError = {
         error: true,
         message: 'Erro ao buscar quiz',
+        statusCode: 400
+      };
+
+      return errorMessage;
+    }
+  },
+
+  answerQuiz: async (answerResponse: IQuizAnswer): Promise<{ isRight: boolean, rightAnswer: string } | IGenericError> => {
+    try {
+      const { quizId, question, answer } = answerResponse;
+
+      const quiz = await QuizModel.findOne(
+        { _id: quizId, 'questions.question': question },
+        { 'questions.$': 1 }
+      );
+
+      if (!quiz) {
+        const errorMessage: IGenericError = {
+          error: true,
+          message: 'Quiz ou questão não encontrados',
+          statusCode: 404
+        };
+
+        return errorMessage;
+      }
+
+      const correctAnswer = quiz.questions[0].rightAnswer;
+
+      return {
+        isRight: correctAnswer === answer,
+        rightAnswer: correctAnswer
+      };
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'Erro ao verificar a resposta',
         statusCode: 400
       };
 

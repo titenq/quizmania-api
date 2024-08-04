@@ -2,11 +2,13 @@ import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 import {
+  answerQuizController,
   createQuizController,
   getAllQuizController,
   getQuizController
 } from '../controllers/quizController';
 import {
+  quizAnswerSchema,
   quizCreateSchema,
   quizGetAllSchema,
   quizGetSchema
@@ -29,6 +31,12 @@ const quizRoute = async (fastify: FastifyInstance) => {
     .get('/quizzes/quiz/:quizId',
       { schema: quizGetSchema },
       getQuizController
+    );
+  
+  fastify.withTypeProvider<ZodTypeProvider>()
+    .post('/quizzes/quiz/:quizId/answer',
+      { schema: quizAnswerSchema },
+      answerQuizController
     );
 };
 

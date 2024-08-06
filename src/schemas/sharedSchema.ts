@@ -17,7 +17,13 @@ const apiKeySchema = z.object({
     .describe('<pre><code><b>*api_key:</b> string</code></pre>')
 });
 
+const userIdSchema = z.object({
+  userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE))
+    .describe('<pre><code><b>*userId:</b> string</code></pre>')
+});
+
 export {
   errorSchema,
-  apiKeySchema
+  apiKeySchema,
+  userIdSchema
 };

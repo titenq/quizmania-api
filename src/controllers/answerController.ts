@@ -3,14 +3,15 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import errorHandler from '../helpers/errorHandler';
 import answerService from '../services/answerService';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IAnswerBody, IAnswerHeaders } from '../interfaces/answerInterface';
+import { IAnswerBody, IAnswerCreate, IAnswerHeaders, IAnswerParams } from '../interfaces/answerInterface';
 
 const createAnswerController = async (
-  request: FastifyRequest<{ Body: IAnswerBody, Headers: IAnswerHeaders }>,
+  request: FastifyRequest<{ Body: IAnswerBody, Params: IAnswerParams, Headers: IAnswerHeaders }>,
   reply: FastifyReply
 ) => {
   try {
-    const { quizId, answers } = request.body;
+    const { answers } = request.body;
+    const { quizId } = request.params;
     const { api_key } = request.headers;
     const { API_KEY } = process.env;
 
@@ -24,10 +25,19 @@ const createAnswerController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const quizAnswers = await answerService.createAnswers({
-      quizId: quizId.toString(),
-      answers
-    });
+    const totalAnswers = answers?.length;
+    const rightAnswers = answers.filter(answer => answer.isRight)?.length;
+    const wrongAnswers = totalAnswers - rightAnswers;
+
+    const answerCreate: IAnswerCreate = {
+      quizId,
+      answers,
+      totalAnswers,
+      rightAnswers,
+      wrongAnswers
+    };
+
+    const quizAnswers = await answerService.createAnswers(answerCreate);
 
     reply.status(200).send(quizAnswers);
   } catch (error) {

@@ -1,11 +1,9 @@
-import mongoose from 'mongoose';
-
 import AnswersModel from '../models/AnswersModel';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IAnswerBody, IAnswersResponse } from '../interfaces/answerInterface';
+import { IAnswerCreate, IAnswersResponse } from '../interfaces/answerInterface';
 
 const answerService = {
-  createAnswers: async (answers: IAnswerBody) => {
+  createAnswers: async (answers: IAnswerCreate) => {
     try {
       const answersCreated: IAnswersResponse = await AnswersModel.create(answers);
 

@@ -5,11 +5,11 @@ const AnswerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  selectedAnswer: {
+  answer: {
     type: String,
     required: true
   },
-  isCorrect: {
+  isRight: {
     type: Boolean,
     required: true
   }
@@ -21,6 +21,9 @@ const AnswersSchema = new mongoose.Schema({
     required: true
   },
   answers: [AnswerSchema],
+  totalAnswers: Number,
+  rightAnswers: Number,
+  wrongAnswers: Number,
   createdAt: {
     type: Date,
     default: Date.now

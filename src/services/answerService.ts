@@ -1,6 +1,8 @@
+import mongoose from 'mongoose';
+
 import AnswersModel from '../models/AnswersModel';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IAnswerCreate, IAnswersResponse } from '../interfaces/answerInterface';
+import { IAnswerCreate, IAnswerParams, IAnswersResponse } from '../interfaces/answerInterface';
 
 const answerService = {
   createAnswers: async (answers: IAnswerCreate) => {
@@ -19,9 +21,9 @@ const answerService = {
     }
   },
 
-  /* getAnswers: async (query: IQuizGet): Promise<IQuizResponse | IGenericError> => {
+  getAnswers: async (quiz_id: IAnswerParams): Promise<IAnswersResponse[] | IGenericError> => {
     try {
-      const { quizId } = query;
+      const { quizId } = quiz_id;
 
       if (!mongoose.isValidObjectId(quizId)) {
         const errorMessage: IGenericError = {
@@ -33,12 +35,12 @@ const answerService = {
         return errorMessage;
       }
 
-      const response: IQuizResponse | null = await AnswersModel.findById({ _id: quizId });
+      const response: IAnswersResponse[] | null = await AnswersModel.find({ quizId });
 
       if (!response) {
         const errorMessage: IGenericError = {
           error: true,
-          message: 'Não existe quiz com esse ID',
+          message: 'Não existe resposta para esse quizId',
           statusCode: 404
         };
 
@@ -49,13 +51,13 @@ const answerService = {
     } catch (error) {
       const errorMessage: IGenericError = {
         error: true,
-        message: 'Erro ao buscar quiz',
+        message: 'Erro ao buscar resposta',
         statusCode: 400
       };
 
       return errorMessage;
     }
-  } */
+  }
 };
 
 export default answerService;

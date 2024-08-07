@@ -22,8 +22,14 @@ const userIdSchema = z.object({
     .describe('<pre><code><b>*userId:</b> string</code></pre>')
 });
 
+const quizIdSchema = z.object({
+  quizId: z.string(genMsgError('quizId', Type.STRING, Required.TRUE))
+    .describe('<pre><code><b>*quizId:</b> string</code></pre>')
+});
+
 export {
   errorSchema,
   apiKeySchema,
-  userIdSchema
+  userIdSchema,
+  quizIdSchema
 };

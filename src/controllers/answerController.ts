@@ -3,7 +3,13 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import errorHandler from '../helpers/errorHandler';
 import answerService from '../services/answerService';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IAnswerBody, IAnswerCreate, IAnswerHeaders, IAnswerParams } from '../interfaces/answerInterface';
+import {
+  IAnswerBody,
+  IAnswerCreate,
+  IAnswerHeaders,
+  IAnswerParams,
+  IAnswersResponse
+} from '../interfaces/answerInterface';
 
 const createAnswerController = async (
   request: FastifyRequest<{ Body: IAnswerBody, Params: IAnswerParams, Headers: IAnswerHeaders }>,
@@ -32,21 +38,21 @@ const createAnswerController = async (
     const answerCreate: IAnswerCreate = {
       quizId,
       answers,
-      totalAnswers,
-      rightAnswers,
-      wrongAnswers
+      totalAnswers: totalAnswers,
+      rightAnswers: rightAnswers,
+      wrongAnswers: wrongAnswers
     };
 
     const quizAnswers = await answerService.createAnswers(answerCreate);
 
-    reply.status(200).send(quizAnswers);
+    reply.status(201).send(quizAnswers);
   } catch (error) {
     errorHandler(error, request, reply);
   }
 };
 
-/* const getAnswerController = async (
-  request: FastifyRequest<{ Params: IQuizGetParams, Headers: IQuizHeaders }>,
+const getAnswersController = async (
+  request: FastifyRequest<{ Params: IAnswerParams, Headers: IAnswerHeaders }>,
   reply: FastifyReply
 ) => {
   try {
@@ -64,7 +70,7 @@ const createAnswerController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const response: IQuizResponse | IGenericError = await quizService.getQuiz({ quizId });
+    const response: IAnswersResponse[] | IGenericError = await answerService.getAnswers({ quizId });
 
     if ((response as IGenericError).error) {
       return errorHandler(response, request, reply)
@@ -74,15 +80,15 @@ const createAnswerController = async (
   } catch (error) {
     const errorMessage: IGenericError = {
       error: true,
-      message: 'erro ao buscar quiz',
+      message: 'erro ao buscar respostas',
       statusCode: 400
     };
 
     errorHandler(errorMessage, request, reply);
   }
-}; */
+};
 
 export {
   createAnswerController,
-  // getAnswerController
+  getAnswersController
 };

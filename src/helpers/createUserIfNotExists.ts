@@ -15,6 +15,7 @@ const createUserIfNotExists = async (user: IUser): Promise<IUserResponse | IGene
     return userExists;
   } catch (error) {
     const errorMessage: IGenericError = {
+      error: true,
       message: 'Erro ao criar usuário',
       statusCode: 400
     };

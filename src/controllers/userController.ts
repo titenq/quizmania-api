@@ -16,6 +16,7 @@ export const createUserController = async (
 
     if (api_key !== API_KEY) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'api_key inválida',
         statusCode: 401,
       };
@@ -29,6 +30,7 @@ export const createUserController = async (
 
     if (userExists) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'E-mail já cadastrado',
         statusCode: 409,
       };
@@ -47,6 +49,7 @@ export const createUserController = async (
     reply.status(200).send(user);
   } catch (error) {
     const errorMessage: IGenericError = {
+      error: true,
       message: 'Erro ao criar usuário',
       statusCode: 500,
     };
@@ -66,6 +69,7 @@ export const getUserByEmailController = async (
 
     if (!user) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao buscar usuário por e-mail',
         statusCode: 404,
       };
@@ -78,6 +82,7 @@ export const getUserByEmailController = async (
     reply.status(200).send(user);
   } catch (error) {
     const errorMessage: IGenericError = {
+      error: true,
       message: 'Erro ao buscar usuário por e-mail',
       statusCode: 500,
     };

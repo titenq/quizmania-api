@@ -10,6 +10,7 @@ const userService = {
       return userCreated;
     } catch (error) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao criar usuário',
         statusCode: 400
       }
@@ -25,6 +26,7 @@ const userService = {
       return user;
     } catch (error) {
       const errorMessage: IGenericError = {
+        error: true,
         message: 'Erro ao buscar usuário por e-mail',
         statusCode: 404
       }

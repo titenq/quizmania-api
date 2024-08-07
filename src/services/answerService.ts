@@ -93,7 +93,6 @@ const answerService = {
 
         for await (const id of quizzesId) {
           const fetchAnswers = await answerService.getAnswers({ quizId: id });
-          console.log(fetchAnswers)
 
           if ('error' in fetchAnswers) {
             const errorMessage: IGenericError = {

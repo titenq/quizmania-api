@@ -27,6 +27,7 @@ export interface IAnswersPercentageParams {
 }
 
 export interface IAnswersPercentageResponse {
+  answersLength: number;
   percentRight: number;
   percentWrong: number;
 }

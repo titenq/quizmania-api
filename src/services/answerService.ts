@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import AnswersModel from '../models/AnswersModel';
 import { IGenericError } from '../interfaces/errorInterface';
 import { IAnswerCreate, IAnswerParams, IAnswersPercentageResponse, IAnswersResponse } from '../interfaces/answerInterface';
-import { getAnswersPercentages } from '../helpers/calculatePercentage';
+import { calculateAnswersPercentages } from '../helpers/calculatePercentage';
 import quizService from './quizService';
 import { IQuizGetAll } from '../interfaces/quizInterface';
 
@@ -93,6 +93,7 @@ const answerService = {
 
         for await (const id of quizzesId) {
           const fetchAnswers = await answerService.getAnswers({ quizId: id });
+          console.log(fetchAnswers)
 
           if ('error' in fetchAnswers) {
             const errorMessage: IGenericError = {
@@ -108,7 +109,7 @@ const answerService = {
         }
       }
 
-      const percentages = getAnswersPercentages(fetchTotalAnswers);
+      const percentages = calculateAnswersPercentages(fetchTotalAnswers);
 
       return percentages;
     } catch (error) {

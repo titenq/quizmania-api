@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 import AnswersModel from '../models/AnswersModel';
 import { IGenericError } from '../interfaces/errorInterface';
-import { IAnswerCreate, IAnswerParams, IAnswersResponse } from '../interfaces/answerInterface';
+import { IAnswerCreate, IAnswerParams, IAnswersPercentageResponse, IAnswersResponse } from '../interfaces/answerInterface';
+import { getAnswersPercentages } from '../helpers/calculatePercentage';
+import quizService from './quizService';
+import { IQuizGetAll } from '../interfaces/quizInterface';
 
 const answerService = {
   createAnswers: async (answers: IAnswerCreate) => {
@@ -52,6 +55,66 @@ const answerService = {
       const errorMessage: IGenericError = {
         error: true,
         message: 'Erro ao buscar resposta',
+        statusCode: 400
+      };
+
+      return errorMessage;
+    }
+  },
+
+  getAnswersPercentage: async (data: IQuizGetAll): Promise<IAnswersPercentageResponse[] | IGenericError> => {
+    try {
+      const response = await quizService.getAllQuiz(data);
+
+      if ('error' in response) {
+        const errorMessage: IGenericError = {
+          error: true,
+          message: response.message,
+          statusCode: response.statusCode
+        };
+
+        return errorMessage;
+      }
+
+      if (!response) {
+        const errorMessage: IGenericError = {
+          error: true,
+          message: 'Não existe resposta para esse quiz',
+          statusCode: 404,
+        };
+
+        return errorMessage;
+      }
+
+      const fetchTotalAnswers: IAnswersResponse[][] = [];
+
+      if ('quizzes' in response) {
+        const quizzesId = response.quizzes.map(item => item._id.toString());
+
+        for await (const id of quizzesId) {
+          const fetchAnswers = await answerService.getAnswers({ quizId: id });
+
+          if ('error' in fetchAnswers) {
+            const errorMessage: IGenericError = {
+              error: true,
+              message: fetchAnswers.message,
+              statusCode: fetchAnswers.statusCode
+            };
+
+            return errorMessage;
+          }
+
+          fetchTotalAnswers.push(fetchAnswers);
+        }
+      }
+
+      const percentages = getAnswersPercentages(fetchTotalAnswers);
+
+      return percentages;
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'Erro ao calcular percentuais',
         statusCode: 400
       };
 

@@ -8,6 +8,8 @@ import {
   IAnswerCreate,
   IAnswerHeaders,
   IAnswerParams,
+  IAnswersPercentageParams,
+  IAnswersPercentageQuery,
   IAnswersResponse
 } from '../interfaces/answerInterface';
 
@@ -72,7 +74,7 @@ const getAnswersController = async (
 
     const response: IAnswersResponse[] | IGenericError = await answerService.getAnswers({ quizId });
 
-    if ((response as IGenericError).error) {
+    if ('error' in response) {
       return errorHandler(response, request, reply)
     }
 
@@ -88,7 +90,42 @@ const getAnswersController = async (
   }
 };
 
+const getAnswersPercentageController = async (
+  request: FastifyRequest<{ Params: IAnswersPercentageParams, Querystring: IAnswersPercentageQuery, Headers: IAnswerHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { page } = request.query;
+    const { userId } = request.params;
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const percentages = await answerService.getAnswersPercentage({ userId, page });
+
+    reply.status(200).send(percentages);
+  } catch (error) {
+    const errorMessage: IGenericError = {
+      error: true,
+      message: 'Erro ao calcular percentual',
+      statusCode: 400,
+    };
+
+    errorHandler(errorMessage, request, reply);
+  }
+};
+
 export {
   createAnswerController,
-  getAnswersController
+  getAnswersController,
+  getAnswersPercentageController
 };

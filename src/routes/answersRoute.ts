@@ -1,6 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { createAnswerController, getAnswersController } from '../controllers/answerController';
+import {
+  createAnswerController,
+  getAnswersController,
+  getAnswersPercentageController
+} from '../controllers/answerController';
 import { answerCreateSchema, answersGetSchema } from '../schemas/answerSchema';
 
 const answersRoute = async (fastify: FastifyInstance) => {
@@ -14,6 +18,13 @@ const answersRoute = async (fastify: FastifyInstance) => {
     .get('/answers/:quizId',
       { schema: answersGetSchema },
       getAnswersController
+    );
+  
+  fastify.withTypeProvider<ZodTypeProvider>()
+    .get('/answers/:userId/percentage',
+      // { schema: answersGetPercentageSchema },
+      { schema: { hide: true } },
+      getAnswersPercentageController
     );
 };
 

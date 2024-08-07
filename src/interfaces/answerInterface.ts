@@ -18,6 +18,19 @@ export interface IAnswerParams {
   quizId: string;
 }
 
+export interface IAnswersPercentageQuery {
+  page: string;
+}
+
+export interface IAnswersPercentageParams {
+  userId: string;
+}
+
+export interface IAnswersPercentageResponse {
+  percentRight: number;
+  percentWrong: number;
+}
+
 export interface IAnswerCreate extends IAnswerParams, IAnswerBody {
   totalAnswers: number;
   rightAnswers: number;

@@ -95,7 +95,7 @@ const getQuizController = async (
 
     const response: IQuizModifiedResponse | IGenericError = await quizService.getQuiz({ quizId });
 
-    if ((response as IGenericError).error) {
+    if ('error' in response) {
       return errorHandler(response, request, reply)
     }
 
@@ -137,7 +137,7 @@ const answerQuizController = async (
       answer
     });
 
-    if ((response as IGenericError).error) {
+    if ('error' in response) {
       return errorHandler(response, request, reply)
     }
 

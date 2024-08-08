@@ -27,9 +27,15 @@ const quizIdSchema = z.object({
     .describe('<pre><code><b>*quizId:</b> string</code></pre>')
 });
 
+const queryPageSchma = z.object({
+  page: z.string(genMsgError('page', Type.STRING, Required.TRUE))
+    .describe('<pre><code><b>*page:</b> string</code></pre>')
+});
+
 export {
   errorSchema,
   apiKeySchema,
   userIdSchema,
-  quizIdSchema
+  quizIdSchema,
+  queryPageSchma
 };

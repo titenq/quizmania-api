@@ -17,7 +17,7 @@ const answersSchema = z.object({
 const answerSchema = z.object({
   answers: z.array(answersSchema)
 })
-  .describe(`<pre><code><b>*answers:</b> [
+  .describe(`<pre><code><b>*answers:</b>[
   <b>*question:</b> string (min: 5, max: 256)
   <b>*answer:</b> string (min: 1, max: 256)
   <b>*isRight:</b> boolean
@@ -35,14 +35,18 @@ const answerResponseSchema = z.object({
 })
   .describe(`<pre><code><b>*_id:</b> string
 <b>*quizId:</b> string
-<b>*answers:</b> [{
-  <b>*userId:</b> string
-  <b>*answers:</b> [{
-    <b>*question:</b> string (min: 5, max: 256)
-    <b>*answer:</b> string (min: 1, max: 256)
-    <b>*isRight:</b> boolean
-  }]
-}]
+<b>*answers:</b> [
+  {
+    <b>*userId:</b> string
+    <b>*answers:</b> [
+      {
+        <b>*question:</b> string (min: 5, max: 256)
+        <b>*answer:</b> string (min: 1, max: 256)
+        <b>*isRight:</b> boolean
+      }
+    ]
+  }
+]
 <b>*createdAt:</b> Date
 </code></pre>`);
 
@@ -56,21 +60,40 @@ const answersGetResponseSchema = z.array(
     wrongAnswers: z.number(genMsgError('wrongAnswers', Type.NUMBER, Required.TRUE)),
     createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
 }))
-  .describe(`<pre><code> [
+  .describe(`<pre><code>[
   <b>*_id:</b> string
   <b>*quizId:</b> string
-  <b>*answers:</b> [{
-    <b>*userId:</b> string
-    <b>*answers:</b> [{
-      <b>*question:</b> string (min: 5, max: 256)
-      <b>*answer:</b> string (min: 1, max: 256)
-      <b>*isRight:</b> boolean
-    }]
-  }],
+  <b>*answers:</b> [
+    {
+      <b>*userId:</b> string
+      <b>*answers:</b> [
+        {
+          <b>*question:</b> string (min: 5, max: 256)
+          <b>*answer:</b> string (min: 1, max: 256)
+          <b>*isRight:</b> boolean
+        }
+      ]
+    }
+  ],
   <b>*totalAnswers:</b> number
   <b>*rightAnswers:</b> number
   <b>*wrongAnswers:</b> number
   <b>*createdAt:</b> Date
+]
+</code></pre>`);
+
+const answersGetPercentageResponseSchema = z.array(
+  z.object({
+    answersLength: z.number(genMsgError('answersLength', Type.NUMBER, Required.TRUE)),
+    percentRight: z.number(genMsgError('percentRight', Type.NUMBER, Required.TRUE)),
+    percentWrong: z.number(genMsgError('percentWrong', Type.NUMBER, Required.TRUE))
+}))
+  .describe(`<pre><code>[
+  {
+    <b>*answersLength:</b> number
+    <b>*percentRight:</b> number
+    <b>*percentWrong:</b> number
+  }
 ]
 </code></pre>`);
 
@@ -100,7 +123,21 @@ const answersGetSchema = {
   }
 };
 
+const answersGetPercentageSchema = {
+  summary: 'Listar percentuais por userId',
+  tags: ['Answers'],
+  params: userIdSchema,
+  headers: apiKeySchema,
+  response: {
+    200: answersGetPercentageResponseSchema,
+    400: errorSchema,
+    401: errorSchema,
+    404: errorSchema
+  }
+};
+
 export {
   answerCreateSchema,
-  answersGetSchema
+  answersGetSchema,
+  answersGetPercentageSchema
 };

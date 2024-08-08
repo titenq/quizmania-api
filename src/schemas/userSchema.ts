@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { genMsgError, Required, Type } from '../helpers/genMsgError';
+import { apiKeySchema, errorSchema } from './sharedSchema';
 
 const userSchema = z.object({
   name: z.string(genMsgError('name', Type.STRING, Required.TRUE)),
@@ -21,10 +22,7 @@ const userCreateSchema = {
 <b>*email:</b> string
 <b>picture:</b> string
 </code></pre>`),
-  headers: z.object({
-    api_key: z.string(genMsgError('api_key', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*api_key:</b> string</code></pre>')
-  }),
+  headers: apiKeySchema,
   response: {
     201: userResponseSchema
       .describe(`<pre><code><b>*_id:</b> string
@@ -33,13 +31,7 @@ const userCreateSchema = {
 <b>picture:</b> string
 <b>*createdAt:</b> Date
 </code></pre>`),
-    400: z.object({
-      message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
-      statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
-    })
-      .describe(`<pre><code><b>*message:</b> string
-<b>*statusCode:</b> number
-</code></pre>`)
+    400: errorSchema
   }
 };
 
@@ -64,13 +56,7 @@ const userGetByEmailSchema = {
 <b>picture:</b> string
 <b>*createdAt:</b> Date
 </code></pre>`),
-    400: z.object({
-      message: z.string(genMsgError('message', Type.STRING, Required.TRUE)),
-      statusCode: z.number(genMsgError('statusCode', Type.NUMBER, Required.TRUE))
-    })
-      .describe(`<pre><code><b>*message:</b> string
-<b>*statusCode:</b> number
-</code></pre>`)
+    400: errorSchema
   }
 };
 

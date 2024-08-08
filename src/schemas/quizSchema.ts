@@ -2,7 +2,13 @@ import mongoose from 'mongoose';
 import { z } from 'zod';
 
 import { genMsgError, Required, Type } from '../helpers/genMsgError';
-import { apiKeySchema, errorSchema } from './sharedSchema';
+import {
+  apiKeySchema,
+  errorSchema,
+  queryPageSchma,
+  quizIdSchema,
+  userIdSchema
+} from './sharedSchema';
 
 const questionSchema = z.object({
   question: z.string(genMsgError('question', Type.STRING, Required.TRUE))
@@ -64,16 +70,18 @@ const quizResponseSchema = z.object({
   .describe(`<pre><code><b>*_id:</b> string
 <b>*userId:</b> string
 <b>*quizTitle:</b> string
-<b>*questions:</b> [{
-  <b>*question:</b> string
-  <b>*answers:</b> [
-    string,
-    string,
-    string,
-    string,
-    string
-  ]
-}]
+<b>*questions:</b> [
+  {
+    <b>*question:</b> string
+    <b>*answers:</b> [
+      string,
+      string,
+      string,
+      string,
+      string
+    ]
+  }
+]
 <b>*createdAt:</b> Date
 </code></pre>`);
 
@@ -89,16 +97,18 @@ const quizResponseModifiedSchema = z.object({
   .describe(`<pre><code><b>*_id:</b> string
 <b>*userId:</b> string
 <b>*quizTitle:</b> string
-<b>*questions:</b> [{
-  <b>*question:</b> string
-  <b>*answers:</b> [
-    string,
-    string,
-    string,
-    string,
-    string
-  ]
-}]
+<b>*questions:</b> [
+  {
+    <b>*question:</b> string
+    <b>*answers:</b> [
+      string,
+      string,
+      string,
+      string,
+      string
+    ]
+  }
+]
 <b>*createdAt:</b> Date
 </code></pre>`);
 
@@ -127,16 +137,18 @@ const quizGetAllResponseSchema = z.object({
   <b>*_id:</b> string
   <b>*userId:</b> string
   <b>*quizTitle:</b> string
-  <b>*questions:</b> [{
-    <b>*question:</b> string
-    <b>*rightAnswer:</b> string
-    <b>*wrongAnswers:</b> [
-      string,
-      string,
-      string,
-      string
-    ]
-  }]
+  <b>*questions:</b> [
+    {
+      <b>*question:</b> string
+      <b>*rightAnswer:</b> string
+      <b>*wrongAnswers:</b> [
+        string,
+        string,
+        string,
+        string
+      ]
+    }
+  ]
   <b>*createdAt:</b> Date
 ]
 <b>*totalPages:</b> number
@@ -168,14 +180,8 @@ const quizCreateSchema = {
 const quizGetAllSchema = {
   summary: 'Buscar todos os quizzes de um usuário',
   tags: ['Quizzes'],
-  querystring: z.object({
-    page: z.string(genMsgError('page', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*page:</b> string</code></pre>')
-  }),
-  params: z.object({
-    userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*userId:</b> string</code></pre>')
-  }),
+  querystring: queryPageSchma,
+  params: userIdSchema,
   headers: apiKeySchema,
   response: {
     200: quizGetAllResponseSchema,
@@ -187,10 +193,7 @@ const quizGetAllSchema = {
 const quizGetSchema = {
   summary: 'Buscar quiz por id',
   tags: ['Quizzes'],
-  params: z.object({
-    quizId: z.string(genMsgError('quizId', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*quizId:</b> string</code></pre>')
-  }),
+  params: quizIdSchema,
   headers: apiKeySchema,
   response: {
     200: quizResponseModifiedSchema,
@@ -203,10 +206,7 @@ const quizGetSchema = {
 const quizAnswerSchema = {
   summary: 'Verificar se a resposta enviada está correta',
   tags: ['Quizzes'],
-  params: z.object({
-    quizId: z.string(genMsgError('quizId', Type.STRING, Required.TRUE))
-      .describe('<pre><code><b>*quizId:</b> string</code></pre>')
-  }),
+  params: quizIdSchema,
   headers: apiKeySchema,
   response: {
     200: quizResponseAnswerSchema,

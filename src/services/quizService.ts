@@ -218,23 +218,11 @@ const quizService = {
           }
         },
         {
-          $addFields: {
-            answersCount: { $size: '$answers' }
-          }
-        },
-        {
-          $sort: { answersCount: -1 }
-        },
-        {
-          $limit: 10
-        },
-        {
           $project: {
             _id: 1,
             userId: 1,
             quizTitle: 1,
-            createdAt: 1,
-            answersCount: 1
+            createdAt: 1
           }
         }
       ]);
@@ -264,6 +252,10 @@ const quizService = {
           percentages
         });
       }
+
+      formattedQuizzes
+        .sort((a, b) => b.percentages.answersLength - a.percentages.answersLength)
+        .slice(0, 10);
 
       return formattedQuizzes;
     } catch (error) {

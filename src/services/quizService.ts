@@ -54,13 +54,13 @@ const quizService = {
 
       const quizzes: IQuizAdmin[] = await QuizModel
         .find({ userId }, '_id quizTitle createdAt')
-        .limit(20)
-        .skip((Number(page) - 1) * 20)
+        .limit(10)
+        .skip((Number(page) - 1) * 10)
         .sort({ createdAt: 'desc' });
 
       const quizzesPaged: IQuizAdminResponse = {
         quizzes,
-        totalPages: Math.ceil(count / 20),
+        totalPages: Math.ceil(count / 10),
         currentPage: Number(page)
       };
 

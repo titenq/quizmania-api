@@ -10,10 +10,15 @@ import {
   IQuizGet,
   IQuizGetAll,
   IQuizGetAllResponse,
+  IQuizLatest,
+  IQuizLatestResponse,
   IQuizModifiedResponse,
   IQuizResponse
 } from '../interfaces/quizInterface';
 import shuffleAnswers from '../helpers/shuffleAnswers';
+import { IAnswersResponse } from '../interfaces/answerInterface';
+import answerService from './answerService';
+import { calculateAnswersPercentages } from '../helpers/calculatePercentage';
 
 const quizService = {
   createQuiz: async (quiz: IQuiz) => {
@@ -149,6 +154,51 @@ const quizService = {
       const errorMessage: IGenericError = {
         error: true,
         message: 'Erro ao verificar a resposta',
+        statusCode: 400
+      };
+
+      return errorMessage;
+    }
+  },
+
+  getLatestQuiz: async (): Promise<IQuizLatestResponse[] | IGenericError> => {
+    try {
+      const quizzes: IQuizLatest[] = await QuizModel.find({}, '_id userId quizTitle createdAt')
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean();
+
+      const fetchTotalAnswers: IAnswersResponse[][] = [];
+      const quizzesId = quizzes.map(item => item._id.toString());
+
+      for await (const id of quizzesId) {
+        const fetchAnswers = await answerService.getAnswers({ quizId: id });
+
+        if ('error' in fetchAnswers) {
+          const errorMessage: IGenericError = {
+            error: true,
+            message: 'Erro ao verificar a resposta',
+            statusCode: 400
+          };
+
+          return errorMessage;
+        }
+
+        fetchTotalAnswers.push(fetchAnswers);
+      }
+
+      const percentages = calculateAnswersPercentages(fetchTotalAnswers);
+
+      const quizzesWithPercentages = quizzes.map((quiz, index) => ({
+        ...quiz,
+        percentages: percentages[index]
+      }));
+
+      return quizzesWithPercentages;
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'Erro ao buscar últimos quizzes',
         statusCode: 400
       };
 

@@ -11,6 +11,7 @@ import {
   IQuizGetAllQuery,
   IQuizGetParams,
   IQuizHeaders,
+  IQuizLatestResponse,
   IQuizModifiedResponse,
   IQuizResponse
 } from '../interfaces/quizInterface';
@@ -138,7 +139,7 @@ const answerQuizController = async (
     });
 
     if ('error' in response) {
-      return errorHandler(response, request, reply)
+      return errorHandler(response.message, request, reply)
     }
 
     reply.status(200).send(response);
@@ -147,9 +148,46 @@ const answerQuizController = async (
   }
 };
 
+const getLatestQuizController = async (
+  request: FastifyRequest<{ Headers: IQuizHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const response: IQuizLatestResponse[] | IGenericError = await quizService.getLatestQuiz();
+
+    if ('error' in response) {
+      return errorHandler(response.message, request, reply)
+    }
+
+    reply.status(200).send(response);
+  } catch (error) {
+    const errorMessage: IGenericError = {
+      error: true,
+      message: 'erro ao buscar últimos quizzes',
+      statusCode: 400
+    };
+
+    errorHandler(errorMessage, request, reply);
+  }
+};
+
 export {
   createQuizController,
   getAllQuizController,
   getQuizController,
-  answerQuizController
+  answerQuizController,
+  getLatestQuizController
 };

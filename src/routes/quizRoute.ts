@@ -5,12 +5,14 @@ import {
   answerQuizController,
   createQuizController,
   getAllQuizController,
+  getLatestQuizController,
   getQuizController
 } from '../controllers/quizController';
 import {
   quizAnswerSchema,
   quizCreateSchema,
   quizGetAllSchema,
+  quizGetLatestSchema,
   quizGetSchema
 } from '../schemas/quizSchema';
 
@@ -37,6 +39,12 @@ const quizRoute = async (fastify: FastifyInstance) => {
     .post('/quizzes/quiz/:quizId/answer',
       { schema: quizAnswerSchema },
       answerQuizController
+    );
+  
+  fastify.withTypeProvider<ZodTypeProvider>()
+    .get('/quizzes/latest',
+      { schema: quizGetLatestSchema },
+      getLatestQuizController
     );
 };
 

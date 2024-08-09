@@ -165,6 +165,34 @@ const quizResponseAnswerSchema = z.object({
 <b>*rightAnswer:</b> string
 </code></pre>`);
 
+const quizResponseLatestSchema = z.array(
+  z.object({
+    _id: z.instanceof(mongoose.Types.ObjectId, genMsgError('_id', Type.STRING, Required.NULL)),
+    userId: z.string(genMsgError('userId', Type.STRING, Required.TRUE)),
+    quizTitle: z.string(genMsgError('quizTitle', Type.STRING, Required.TRUE))
+      .min(5, genMsgError('quizTitle', Type.MIN, Required.NULL, '5'))
+      .max(64, genMsgError('quizTitle', Type.MAX, Required.NULL, '64')),
+    percentages: z.object({
+      answersLength: z.number(genMsgError('answersLength', Type.NUMBER, Required.TRUE)),
+      percentRight: z.number(genMsgError('percentRight', Type.NUMBER, Required.TRUE)),
+      percentWrong: z.number(genMsgError('percentWrong', Type.NUMBER, Required.TRUE))
+    }),
+    createdAt: z.date(genMsgError('createdAt', Type.DATE, Required.TRUE))
+  })
+)
+  .describe(`<pre><code><b>[
+  <b>*_id:</b> string
+  <b>*userId:</b> string
+  <b>*quizTitle:</b> string
+  <b>*percentage:</b>{
+    <b>*answersLength:</b> number
+    <b>*percentRight:</b> number
+    <b>*percentWrong:</b> number
+  }
+  <b>*createdAt:</b> Date
+]
+</code></pre>`);
+
 const quizCreateSchema = {
   summary: 'Criar quiz',
   tags: ['Quizzes'],
@@ -216,9 +244,21 @@ const quizAnswerSchema = {
   }
 };
 
+const quizGetLatestSchema = {
+  summary: 'Buscar últimos quizzes',
+  tags: ['Quizzes'],
+  headers: apiKeySchema,
+  response: {
+    200: quizResponseLatestSchema,
+    400: errorSchema,
+    401: errorSchema
+  }
+};
+
 export {
   quizCreateSchema,
   quizGetAllSchema,
   quizGetSchema,
-  quizAnswerSchema
+  quizAnswerSchema,
+  quizGetLatestSchema
 };

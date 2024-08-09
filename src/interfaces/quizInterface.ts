@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { IAnswersPercentageResponse } from './answerInterface';
+
 export interface IQuestion {
   question: string;
   rightAnswer: string;
@@ -82,4 +84,10 @@ export interface IQuizAnswer {
   quizId: string;
   question: string;
   answer: string;
+}
+
+export interface IQuizLatest extends Omit<IQuizModifiedResponse, 'questions'> { }
+
+export interface IQuizLatestResponse extends IQuizLatest {
+  percentages: IAnswersPercentageResponse
 }

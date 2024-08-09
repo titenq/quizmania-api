@@ -164,7 +164,7 @@ const getLatestQuizController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const response: IQuizLatestResponse[] | IGenericError = await quizService.getLatestQuiz();
+    const response: IQuizLatestResponse[] | IGenericError = await quizService.getLatestQuizzes();
 
     if ('error' in response) {
       return errorHandler(response.message, request, reply)
@@ -182,10 +182,47 @@ const getLatestQuizController = async (
   }
 };
 
+const getTopQuizController = async (
+  request: FastifyRequest<{ Headers: IQuizHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const response: IQuizLatestResponse[] | IGenericError = await quizService.getTopQuizzes();
+
+    if ('error' in response) {
+      return errorHandler(response.message, request, reply)
+    }
+
+    reply.status(200).send(response);
+  } catch (error) {
+    const errorMessage: IGenericError = {
+      error: true,
+      message: 'erro ao buscar top quizzes',
+      statusCode: 400
+    };
+
+    errorHandler(errorMessage, request, reply);
+  }
+};
+
 export {
   createQuizController,
   getAllQuizController,
   getQuizController,
   answerQuizController,
-  getLatestQuizController
+  getLatestQuizController,
+  getTopQuizController
 };

@@ -161,7 +161,7 @@ const quizService = {
     }
   },
 
-  getLatestQuiz: async (): Promise<IQuizLatestResponse[] | IGenericError> => {
+  getLatestQuizzes: async (): Promise<IQuizLatestResponse[] | IGenericError> => {
     try {
       const quizzes: IQuizLatest[] = await QuizModel.find({}, '_id userId quizTitle createdAt')
         .sort({ createdAt: -1 })
@@ -199,6 +199,77 @@ const quizService = {
       const errorMessage: IGenericError = {
         error: true,
         message: 'Erro ao buscar últimos quizzes',
+        statusCode: 400
+      };
+
+      return errorMessage;
+    }
+  },
+
+  getTopQuizzes: async () => {
+    try {
+      const quizzes: IQuizLatest[] = await QuizModel.aggregate([
+        {
+          $lookup: {
+            from: 'answers',
+            localField: '_id',
+            foreignField: 'quizId',
+            as: 'answers'
+          }
+        },
+        {
+          $addFields: {
+            answersCount: { $size: '$answers' }
+          }
+        },
+        {
+          $sort: { answersCount: -1 }
+        },
+        {
+          $limit: 10
+        },
+        {
+          $project: {
+            _id: 1,
+            userId: 1,
+            quizTitle: 1,
+            createdAt: 1,
+            answersCount: 1
+          }
+        }
+      ]);
+
+      const formattedQuizzes = [];
+
+      for await (const quiz of quizzes) {
+        const fetchAnswers = await answerService.getAnswers({ quizId: quiz._id.toString() });
+
+        if ('error' in fetchAnswers) {
+          const errorMessage: IGenericError = {
+            error: true,
+            message: 'Erro ao verificar a resposta',
+            statusCode: 400
+          };
+
+          return errorMessage;
+        }
+
+        const [percentages] = calculateAnswersPercentages([fetchAnswers]);
+
+        formattedQuizzes.push({
+          _id: quiz._id,
+          userId: quiz.userId,
+          quizTitle: quiz.quizTitle,
+          createdAt: quiz.createdAt,
+          percentages
+        });
+      }
+
+      return formattedQuizzes;
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'Erro ao buscar os quizzes mais respondidos',
         statusCode: 400
       };
 

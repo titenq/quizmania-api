@@ -255,10 +255,22 @@ const quizGetLatestSchema = {
   }
 };
 
+const quizGetTopSchema = {
+  summary: 'Buscar top quizzes',
+  tags: ['Quizzes'],
+  headers: apiKeySchema,
+  response: {
+    200: quizResponseLatestSchema,
+    400: errorSchema,
+    401: errorSchema
+  }
+};
+
 export {
   quizCreateSchema,
   quizGetAllSchema,
   quizGetSchema,
   quizAnswerSchema,
-  quizGetLatestSchema
+  quizGetLatestSchema,
+  quizGetTopSchema
 };

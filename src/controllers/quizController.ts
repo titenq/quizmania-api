@@ -5,15 +5,13 @@ import quizService from '../services/quizService';
 import { IGenericError } from '../interfaces/errorInterface';
 import {
   IQuiz,
-  IQuizAnswer,
   IQuizBodyAnswer,
   IQuizGetAllParams,
   IQuizGetAllQuery,
   IQuizGetParams,
   IQuizHeaders,
   IQuizLatestResponse,
-  IQuizModifiedResponse,
-  IQuizResponse
+  IQuizModifiedResponse
 } from '../interfaces/quizInterface';
 
 const createQuizController = async (

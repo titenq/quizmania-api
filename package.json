@@ -22,8 +22,6 @@
     "@fastify/static": "^7.0.4",
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^4.0.0",
-    "@swc/cli": "^0.4.0",
-    "@swc/core": "^1.6.13",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
@@ -32,6 +30,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "^1.7.10",
     "@types/node": "^20.14.10",
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",

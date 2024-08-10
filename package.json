@@ -11,6 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20.15.1"
+  },
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
     "@fastify/cors": "^9.0.1",

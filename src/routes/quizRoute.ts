@@ -53,8 +53,7 @@ const quizRoute = async (fastify: FastifyInstance) => {
   
   fastify.withTypeProvider<ZodTypeProvider>()
     .get('/quizzes/latest',
-      // { schema: quizGetLatestSchema },
-      { schema: { hide: true } },
+      { schema: quizGetLatestSchema },
       getLatestQuizController
   );
   

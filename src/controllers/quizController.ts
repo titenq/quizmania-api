@@ -8,6 +8,7 @@ import {
   IQuizBodyAnswer,
   IQuizGetAllParams,
   IQuizGetAllQuery,
+  IQuizGetLatestQuery,
   IQuizGetParams,
   IQuizHeaders,
   IQuizLatestResponse,
@@ -174,10 +175,11 @@ const answerQuizController = async (
 };
 
 const getLatestQuizController = async (
-  request: FastifyRequest<{ Headers: IQuizHeaders }>,
+  request: FastifyRequest<{ Querystring: IQuizGetLatestQuery, Headers: IQuizHeaders }>,
   reply: FastifyReply
 ) => {
   try {
+    const { limit } = request.query;
     const { api_key } = request.headers;
     const { API_KEY } = process.env;
 
@@ -191,7 +193,7 @@ const getLatestQuizController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const response: IQuizLatestResponse[] | IGenericError = await quizService.getLatestQuizzes();
+    const response: IQuizLatestResponse[] | IGenericError = await quizService.getLatestQuizzes({ limit });
 
     if ('error' in response) {
       return errorHandler(response.message, request, reply)

@@ -11,6 +11,7 @@ import {
   IQuizGetAll,
   IQuizGetAllQuery,
   IQuizGetAllResponse,
+  IQuizGetLatestQuery,
   IQuizLatest,
   IQuizLatestResponse,
   IQuizModifiedResponse,
@@ -201,11 +202,13 @@ const quizService = {
     }
   },
 
-  getLatestQuizzes: async (): Promise<IQuizLatestResponse[] | IGenericError> => {
+  getLatestQuizzes: async (query: IQuizGetLatestQuery): Promise<IQuizLatestResponse[] | IGenericError> => {
     try {
+      const { limit } = query;
+
       const quizzes: IQuizLatest[] = await QuizModel.find({}, '_id userId quizTitle createdAt')
         .sort({ createdAt: -1 })
-        .limit(10)
+        .limit(limit)
         .lean();
 
       const fetchTotalAnswers: IAnswersResponse[][] = [];

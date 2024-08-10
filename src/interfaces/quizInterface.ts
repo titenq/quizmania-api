@@ -75,6 +75,10 @@ export interface IQuizGetParams {
   quizId: string;
 }
 
+export interface IQuizGetLatestQuery {
+  limit: number;
+}
+
 export interface IQuizBodyAnswer {
   question: string;
   answer: string;

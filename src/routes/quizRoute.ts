@@ -4,6 +4,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import {
   answerQuizController,
   createQuizController,
+  getAllQuizByUserIdController,
   getAllQuizController,
   getLatestQuizController,
   getQuizController,
@@ -12,6 +13,7 @@ import {
 import {
   quizAnswerSchema,
   quizCreateSchema,
+  quizGetAllByUserIdSchema,
   quizGetAllSchema,
   quizGetLatestSchema,
   quizGetSchema,
@@ -27,6 +29,12 @@ const quizRoute = async (fastify: FastifyInstance) => {
   
   fastify.withTypeProvider<ZodTypeProvider>()
     .get('/quizzes/:userId',
+      { schema: quizGetAllByUserIdSchema },
+      getAllQuizByUserIdController
+    );
+  
+  fastify.withTypeProvider<ZodTypeProvider>()
+    .get('/quizzes',
       { schema: quizGetAllSchema },
       getAllQuizController
     );

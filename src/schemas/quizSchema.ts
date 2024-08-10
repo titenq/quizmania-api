@@ -205,11 +205,23 @@ const quizCreateSchema = {
   }
 };
 
-const quizGetAllSchema = {
+const quizGetAllByUserIdSchema = {
   summary: 'Buscar todos os quizzes de um usuário',
   tags: ['Quizzes'],
   querystring: queryPageSchma,
   params: userIdSchema,
+  headers: apiKeySchema,
+  response: {
+    200: quizGetAllResponseSchema,
+    400: errorSchema,
+    401: errorSchema
+  }
+};
+
+const quizGetAllSchema = {
+  summary: 'Buscar todos os quizzes',
+  tags: ['Quizzes'],
+  querystring: queryPageSchma,
   headers: apiKeySchema,
   response: {
     200: quizGetAllResponseSchema,
@@ -268,6 +280,7 @@ const quizGetTopSchema = {
 
 export {
   quizCreateSchema,
+  quizGetAllByUserIdSchema,
   quizGetAllSchema,
   quizGetSchema,
   quizAnswerSchema,

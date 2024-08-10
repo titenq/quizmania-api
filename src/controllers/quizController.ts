@@ -45,7 +45,7 @@ const createQuizController = async (
   }
 };
 
-const getAllQuizController = async (
+const getAllQuizByUserIdController = async (
   request: FastifyRequest<{ Querystring: IQuizGetAllQuery, Params: IQuizGetAllParams, Headers: IQuizHeaders }>,
   reply: FastifyReply
 ) => {
@@ -65,7 +65,34 @@ const getAllQuizController = async (
       return errorHandler(errorMessage, request, reply);
     }
 
-    const quizzes = await quizService.getAllQuiz({ userId, page });
+    const quizzes = await quizService.getAllByUserIdQuiz({ userId, page });
+
+    reply.status(200).send(quizzes);
+  } catch (error) {
+    errorHandler(error, request, reply);
+  }
+};
+
+const getAllQuizController = async (
+  request: FastifyRequest<{ Querystring: IQuizGetAllQuery, Headers: IQuizHeaders }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { page } = request.query;
+    const { api_key } = request.headers;
+    const { API_KEY } = process.env;
+
+    if (api_key !== API_KEY) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'api_key inválida',
+        statusCode: 401
+      };
+
+      return errorHandler(errorMessage, request, reply);
+    }
+
+    const quizzes = await quizService.getAllQuiz({ page });
 
     reply.status(200).send(quizzes);
   } catch (error) {
@@ -220,6 +247,7 @@ const getTopQuizController = async (
 
 export {
   createQuizController,
+  getAllQuizByUserIdController,
   getAllQuizController,
   getQuizController,
   answerQuizController,

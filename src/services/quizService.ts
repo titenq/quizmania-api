@@ -9,6 +9,7 @@ import {
   IQuizAnswer,
   IQuizGet,
   IQuizGetAll,
+  IQuizGetAllQuery,
   IQuizGetAllResponse,
   IQuizLatest,
   IQuizLatestResponse,
@@ -37,7 +38,7 @@ const quizService = {
     }
   },
 
-  getAllQuiz: async (query: IQuizGetAll) => {
+  getAllByUserIdQuiz: async (query: IQuizGetAll) => {
     try {
       const { userId, page } = query;
       const count = await QuizModel.countDocuments({ userId });
@@ -68,7 +69,46 @@ const quizService = {
     } catch (error) {
       const errorMessage: IGenericError = {
         error: true,
-        message: 'Erro ao criar quiz',
+        message: 'Erro ao listar quizzes pelo ID do usuário',
+        statusCode: 400
+      };
+
+      return errorMessage;
+    }
+  },
+
+  getAllQuiz: async (query: IQuizGetAllQuery) => {
+    try {
+      const { page } = query;
+      const count = await QuizModel.countDocuments();
+
+      if (count === 0) {
+        const quizzesPaged: IQuizGetAllResponse = {
+          quizzes: [],
+          totalPages: 1,
+          currentPage: 1
+        };
+
+        return quizzesPaged;
+      }
+
+      const quizzes: IQuizAdmin[] = await QuizModel
+        .find({}, '_id quizTitle createdAt')
+        .limit(10)
+        .skip((Number(page) - 1) * 10)
+        .sort({ createdAt: 'desc' });
+
+      const quizzesPaged: IQuizAdminResponse = {
+        quizzes,
+        totalPages: Math.ceil(count / 10),
+        currentPage: Number(page)
+      };
+
+      return quizzesPaged;
+    } catch (error) {
+      const errorMessage: IGenericError = {
+        error: true,
+        message: 'Erro ao listar quizzes',
         statusCode: 400
       };
 

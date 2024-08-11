@@ -6,7 +6,7 @@ let webBaseUrl: string;
 if (NODE_ENV === 'DEV') {
   webBaseUrl = 'http://localhost:5173';
 } else {
-  webBaseUrl = 'https://frontend.com';
+  webBaseUrl = 'https://quizmania-one.vercel.app';
 }
 
 export default webBaseUrl;

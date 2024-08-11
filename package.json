@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "npm install @swc/cli @swc/core",
     "build": "swc src --out-dir dist",
     "start": "node dist/src/index.js",
     "dev": "concurrently \"swc src --out-dir dist --watch\" \"node --watch dist/src/index.js\""

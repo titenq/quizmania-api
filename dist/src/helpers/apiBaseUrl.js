@@ -13,6 +13,6 @@ let apiBaseUrl;
 if (NODE_ENV === 'DEV') {
     apiBaseUrl = 'http://localhost:4000';
 } else {
-    apiBaseUrl = 'https://backend.com';
+    apiBaseUrl = 'https://quizmania-api.onrender.com';
 }
 const _default = apiBaseUrl;

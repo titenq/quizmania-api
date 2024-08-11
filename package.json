@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npx swc --version",
     "build": "swc src --out-dir dist",
     "start": "node dist/src/index.js",
     "dev": "concurrently \"swc src --out-dir dist --watch\" \"node --watch dist/src/index.js\""

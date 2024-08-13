@@ -118,8 +118,8 @@ const githubUserController = function() {
                 email: userInfo.email,
                 picture: userInfo.avatar_url
             };
-            yield (0, _createUserIfNotExists.default)(user);
-            reply.status(200).send(user);
+            const userExists = yield (0, _createUserIfNotExists.default)(user);
+            reply.status(200).send(userExists);
         } catch (error) {
             reply.redirect(`${_webBaseUrl.default}/login?error=github`);
         }

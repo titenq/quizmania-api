@@ -78,9 +78,9 @@ export const githubUserController = async (
       picture: userInfo.avatar_url
     };
 
-    await createUserIfNotExists(user);
+    const userExists = await createUserIfNotExists(user);
 
-    reply.status(200).send(user);
+    reply.status(200).send(userExists);
   } catch (error) {
     reply.redirect(`${webBaseUrl}/login?error=github`);
   }

@@ -109,9 +109,9 @@ export const facebookUserController = async (
       picture: photoUrl
     };
 
-    await createUserIfNotExists(user);
+    const userExists = await createUserIfNotExists(user);
 
-    reply.status(200).send(user);
+    reply.status(200).send(userExists);
   } catch (error) {
     reply.redirect(`${webBaseUrl}/login?error=facebook`);
   }

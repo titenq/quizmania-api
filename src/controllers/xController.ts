@@ -87,9 +87,9 @@ export const xUserController = async (
       picture: userInfo.data.profile_image_url
     };
 
-    await createUserIfNotExists(user);
+    const userExists = await createUserIfNotExists(user);
 
-    reply.status(200).send(user);
+    reply.status(200).send(userExists);
   } catch (error) {
     reply.redirect(`${webBaseUrl}/login?error=x`);
   }

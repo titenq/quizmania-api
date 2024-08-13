@@ -64,7 +64,7 @@ const answerService = {
 
   getAnswersPercentage: async (data: IQuizGetAll): Promise<IAnswersPercentageResponse[] | IGenericError> => {
     try {
-      const response = await quizService.getAllQuiz(data);
+      const response = await quizService.getAllByUserIdQuiz(data);
 
       if ('error' in response) {
         const errorMessage: IGenericError = {

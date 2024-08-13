@@ -145,7 +145,7 @@ const answerService = {
     getAnswersPercentage: function() {
         var _ref = _async_to_generator(function*(data) {
             try {
-                const response = yield _quizService.default.getAllQuiz(data);
+                const response = yield _quizService.default.getAllByUserIdQuiz(data);
                 if ('error' in response) {
                     const errorMessage = {
                         error: true,

@@ -1,7 +1,7 @@
 {
   "name": "quizmania-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "API do Projeto Quizmania",
   "main": "index.js",
   "scripts": {
     "build": "swc src --out-dir dist",
@@ -9,8 +9,6 @@
     "dev": "concurrently \"swc src --out-dir dist --watch\" \"node --watch dist/src/index.js\""
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
   "engines": {
     "node": ">=20.15.1"
   },
@@ -36,5 +34,15 @@
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",
     "typescript": "^5.5.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/titenq/quizmania-api.git"
+  },
+  "author": "TitenQ <titenq@gmail.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/titenq/quizmania-api/issues"
+  },
+  "homepage": "https://quizmania-one.vercel.app"
 }

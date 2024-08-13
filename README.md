@@ -6,6 +6,9 @@ API do projeto Quizmania
 ### Site
 [https://quizmania-one.vercel.app](https://quizmania-one.vercel.app "https://quizmania-one.vercel.app")
 
+### Docs
+[https://quizmania-api.onrender.com/docs](https://quizmania-api.onrender.com/docs "https://quizmania-api.onrender.com/docs")
+
 ### Screenshot
 
-![d0r88qN.png](https://iili.io/d0r88qN.png)
+![d10FRIe.png](https://iili.io/d10FRIe.png)

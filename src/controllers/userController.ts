@@ -46,7 +46,7 @@ export const createUserController = async (
       picture,
     });
 
-    reply.status(200).send(user);
+    reply.status(201).send(user);
   } catch (error) {
     const errorMessage: IGenericError = {
       error: true,
